@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  @page { size: A4 portrait; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: #1a1a1a;
+    background: #ffffff;
+  }
+  .page {
+    width: 210mm;
+    height: 297mm;
+    padding: 16mm 15mm;
+    display: flex;
+    flex-direction: column;
+  }
+  .header {
+    text-align: center;
+    border-bottom: 3px solid #1a1a1a;
+    padding-bottom: 10px;
+    margin-bottom: 18px;
+  }
+  .header h1 {
+    font-size: 34px;
+    letter-spacing: 1px;
+    font-weight: 800;
+  }
+  .header p {
+    font-size: 14px;
+    color: #666;
+    margin-top: 4px;
+    font-weight: 500;
+  }
+  .rule-strip {
+    background: #1a1a1a;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    letter-spacing: 0.3px;
+  }
+  .suits {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .suit {
+    border: 2px solid #1a1a1a;
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .suit .sym {
+    font-size: 40px;
+    line-height: 1;
+    width: 46px;
+    text-align: center;
+  }
+  .suit.red .sym { color: #c0182b; }
+  .suit.black .sym { color: #1a1a1a; }
+  .suit .txt h2 {
+    font-size: 20px;
+    font-weight: 800;
+  }
+  .suit .txt p {
+    font-size: 13px;
+    color: #555;
+    margin-top: 2px;
+  }
+  .ace-row {
+    background: #f4c542;
+    border: 2px solid #1a1a1a;
+    border-radius: 10px;
+    padding: 12px 16px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .ace-row h2 { font-size: 19px; font-weight: 800; }
+  .ace-row p { font-size: 13px; color: #4a3c00; margin-top: 2px; font-weight: 600; }
+  .reps {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .reps .box {
+    flex: 1;
+    border: 2px solid #1a1a1a;
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+  }
+  .reps .box .big { font-size: 26px; font-weight: 800; }
+  .reps .box .lbl { font-size: 12px; color: #555; margin-top: 3px; }
+  .section-title {
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #888;
+    margin-bottom: 8px;
+  }
+  .rules-list {
+    list-style: none;
+    margin-bottom: 18px;
+  }
+  .rules-list li {
+    font-size: 13.5px;
+    padding: 5px 0 5px 22px;
+    position: relative;
+    line-height: 1.4;
+  }
+  .rules-list li::before {
+    content: "▸";
+    position: absolute;
+    left: 4px;
+    color: #c0182b;
+    font-weight: bold;
+  }
+  .footer {
+    margin-top: auto;
+    border-top: 2px solid #e0e0e0;
+    padding-top: 12px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #999;
+  }
+  .footer b { color: #1a1a1a; }
+  .total-badge {
+    display: inline-block;
+    background: #eee;
+    border-radius: 20px;
+    padding: 3px 12px;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <h1>52-CARD WORKOUT</h1>
+    <p>Shuffle · Flip one card · Do the reps · No skipping</p>
+  </div>
+
+  <div class="rule-strip">
+    SUIT = the move &nbsp;•&nbsp; NUMBER = the reps
+  </div>
+
+  <div class="suits">
+    <div class="suit red">
+      <div class="sym">&hearts;</div>
+      <div class="txt"><h2>Push-ups</h2><p>Hearts</p></div>
+    </div>
+    <div class="suit black">
+      <div class="sym">&spades;</div>
+      <div class="txt"><h2>Clean &amp; Press</h2><p>Spades · squat-to-press</p></div>
+    </div>
+    <div class="suit black">
+      <div class="sym">&clubs;</div>
+      <div class="txt"><h2>Burpees</h2><p>Clubs</p></div>
+    </div>
+    <div class="suit red">
+      <div class="sym">&diams;</div>
+      <div class="txt"><h2>Sit-ups</h2><p>Diamonds</p></div>
+    </div>
+  </div>
+
+  <div class="ace-row">
+    <h2>🃏 ANY ACE = 20 LUNGES</h2>
+    <p>10 per leg · wildcard — overrides the suit</p>
+  </div>
+
+  <div class="reps">
+    <div class="box"><div class="big">2–10</div><div class="lbl">face value</div></div>
+    <div class="box"><div class="big">J = 11</div><div class="lbl">jack</div></div>
+    <div class="box"><div class="big">Q = 12</div><div class="lbl">queen</div></div>
+    <div class="box"><div class="big">K = 13</div><div class="lbl">king</div></div>
+  </div>
+
+  <div class="section-title">House Rules</div>
+  <ul class="rules-list">
+    <li><b>Jokers</b> — 1-minute rest, OR 30 sec of your hardest move (dealer's choice).</li>
+    <li><b>No stopping</b> until you flip a face card — that's your earned breather.</li>
+    <li><b>Diamonds variant</b> — swap counted sit-ups for a 45-sec plank hold for a nastier core burn.</li>
+    <li><b>Too tough?</b> Run half the deck, or cap all face cards at 10 reps.</li>
+    <li><b>Too easy?</b> Two decks, or bump face cards higher.</li>
+  </ul>
+
+  <div class="footer">
+    <span>Full deck ≈ <b>90</b> each of push-ups / presses / burpees / sit-ups + <b>80</b> lunges</span>
+    <span class="total-badge">~30–45 min</span>
+  </div>
+</div>
+</body>
+</html>
