@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Button } from '../components/Button'
+import { ExternalLink } from '../components/ExternalLink'
 import { FeedbackSheet, Stars } from '../components/FeedbackSheet'
 import { MoveTotals } from '../components/MoveTotals'
 import { ShareSheet } from '../components/ShareSheet'
 import { useLocalStorage } from '../hooks/useLocalStorage'
+import { BRAND } from '../lib/brand'
 import { moveTotals } from '../lib/deck'
 import {
   feedbackEnabled,
@@ -128,6 +130,9 @@ export function SummaryScreen({ session, onRestart, onDone }: Props) {
         <Button variant="ghost" size="lg" onClick={onDone}>
           Change setup
         </Button>
+        <p className="mt-2 text-center text-sm text-base-400">
+          Enjoying {BRAND.name}? <ExternalLink href={BRAND.tipUrl}>Buy me a coffee ☕</ExternalLink>
+        </p>
       </div>
 
       <ShareSheet
