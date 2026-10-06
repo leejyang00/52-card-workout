@@ -21,6 +21,10 @@ Classic moves: ♥ Push-ups · ♠ Clean & Press · ♣ Burpees · ♦ Sit-ups. 
 - **Rep tracking:** done vs. total for each move, plus a summary at the end
 - **Survives reloads:** settings and the workout in progress are saved in the browser (localStorage). No backend, no accounts
 - **Keeps the screen awake** while the timer runs (where supported)
+- **How it works** sheet that opens on a first visit and can be reopened from the setup screen
+- **Share card:** a 1080×1920 story image of the workout (time, cards, reps, breakdown, site link). Uses the native share menu on phones, with Save image / Copy caption as fallbacks
+
+The product name and tagline live in `src/lib/brand.ts`, so a rebrand is a one-file change.
 
 ## Develop
 

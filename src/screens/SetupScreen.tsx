@@ -1,8 +1,12 @@
+import { useState } from 'react'
 import { Button } from '../components/Button'
 import { ExerciseSelect } from '../components/ExerciseSelect'
+import { IntroSheet } from '../components/IntroSheet'
 import { Segmented } from '../components/Segmented'
 import { SuitBadge } from '../components/SuitBadge'
 import { Toggle } from '../components/Toggle'
+import { useLocalStorage } from '../hooks/useLocalStorage'
+import { BRAND } from '../lib/brand'
 import { ACE_REPS, SUIT_LABEL, SUITS } from '../lib/deck'
 import { DEFAULT_SETTINGS, TIMER_PRESETS } from '../lib/settings'
 import type { Settings } from '../lib/types'
@@ -23,6 +27,12 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 export function SetupScreen({ settings, onChange, onStart }: Props) {
+  const [introSeen, setIntroSeen] = useLocalStorage('cw:intro-seen:v1', false)
+  const [introOpen, setIntroOpen] = useState(!introSeen)
+  const closeIntro = () => {
+    setIntroOpen(false)
+    setIntroSeen(true)
+  }
   const set = <K extends keyof Settings>(key: K, value: Settings[K]) => onChange({ ...settings, [key]: value })
   const allNamed = SUITS.every((s) => settings.moves[s].trim()) && settings.aceMove.trim()
   const faceMax = settings.capFaceCards ? 10 : 13
@@ -36,9 +46,20 @@ export function SetupScreen({ settings, onChange, onStart }: Props) {
         <p className="mb-2 text-3xl tracking-widest" aria-hidden>
           <span className="text-suit-red">♥</span> ♠ <span className="text-suit-red">♦</span> ♣
         </p>
-        <h1 className="text-4xl font-black tracking-tight sm:text-5xl">52-Card Workout</h1>
-        <p className="mt-2 text-stone-400">Shuffle · Flip one card · Do the reps · No skipping</p>
+        <h1 className="text-4xl font-black tracking-tight sm:text-5xl">{BRAND.name}</h1>
+        <p className="mt-2 text-stone-400">{BRAND.tagline}</p>
+        <button
+          type="button"
+          onClick={() => setIntroOpen(true)}
+          className="mt-4 inline-flex h-9 items-center gap-2 rounded-full bg-stone-800 px-4 text-sm font-semibold text-stone-200 hover:bg-stone-700 focus-visible:outline-2 focus-visible:outline-accent"
+        >
+          <span aria-hidden className="grid size-5 place-items-center rounded-full bg-accent text-xs font-black text-stone-950">
+            ?
+          </span>
+          How it works
+        </button>
       </header>
+      <IntroSheet open={introOpen} onClose={closeIntro} />
 
       <div className="flex flex-col gap-4">
         <Section title="Suit = the move">

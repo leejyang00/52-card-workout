@@ -1,0 +1,185 @@
+import { BRAND } from './brand'
+import type { MoveTotal } from './deck'
+import { formatDuration } from './format'
+
+export interface ShareStats {
+  cleared: boolean
+  timeMs: number
+  flipped: number
+  deckLength: number
+  reps: number
+  totals: MoveTotal[]
+  date: Date
+  url: string
+}
+
+// Story format: Instagram/WhatsApp status.
+export const SHARE_WIDTH = 1080
+export const SHARE_HEIGHT = 1920
+
+const C = {
+  bg: '#0c0a09',
+  panel: '#1c1917',
+  track: '#292524',
+  text: '#f5f5f4',
+  muted: '#a8a29e',
+  red: '#c0182b',
+  accent: '#f4c542',
+}
+const FONT = 'system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif'
+// U+FE0E asks for the text glyph so iOS doesn't swap suits for emoji.
+const SUITS: [string, string][] = [
+  ['♥︎', C.red],
+  ['♠︎', C.text],
+  ['♦︎', C.red],
+  ['♣︎', C.text],
+]
+
+type Ctx = CanvasRenderingContext2D
+
+function font(ctx: Ctx, weight: number, size: number, tracking = 0) {
+  ctx.font = `${weight} ${size}px ${FONT}`
+  if ('letterSpacing' in ctx) ctx.letterSpacing = `${tracking}px`
+}
+
+function fitText(ctx: Ctx, text: string, maxWidth: number): string {
+  if (ctx.measureText(text).width <= maxWidth) return text
+  let t = text
+  while (t.length > 1 && ctx.measureText(`${t}…`).width > maxWidth) t = t.slice(0, -1)
+  return `${t}…`
+}
+
+function panel(ctx: Ctx, x: number, y: number, w: number, h: number, r: number, color: string) {
+  ctx.fillStyle = color
+  ctx.beginPath()
+  ctx.roundRect(x, y, w, h, r)
+  ctx.fill()
+}
+
+export function drawShareCard(ctx: Ctx, s: ShareStats) {
+  const W = SHARE_WIDTH
+  const PAD = 90
+  const inner = W - PAD * 2
+
+  ctx.fillStyle = C.bg
+  ctx.fillRect(0, 0, W, SHARE_HEIGHT)
+
+  // Card-back stripe band along the top.
+  ctx.save()
+  ctx.beginPath()
+  ctx.rect(0, 0, W, 28)
+  ctx.clip()
+  for (let x = -40; x < W + 40; x += 24) {
+    ctx.fillStyle = (x / 24) % 2 === 0 ? C.red : '#8f1220'
+    ctx.beginPath()
+    ctx.moveTo(x, 0)
+    ctx.lineTo(x + 12, 0)
+    ctx.lineTo(x + 40, 28)
+    ctx.lineTo(x + 28, 28)
+    ctx.fill()
+  }
+  ctx.restore()
+
+  ctx.textBaseline = 'alphabetic'
+  ctx.textAlign = 'left'
+
+  // Brand + date
+  font(ctx, 400, 56)
+  let x = PAD
+  for (const [glyph, color] of SUITS) {
+    ctx.fillStyle = color
+    ctx.fillText(glyph, x, 170)
+    x += 72
+  }
+  font(ctx, 900, 60, -1)
+  ctx.fillStyle = C.text
+  ctx.fillText(BRAND.name, PAD, 260)
+  font(ctx, 500, 36)
+  ctx.fillStyle = C.muted
+  ctx.fillText(
+    s.date.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }),
+    PAD,
+    316,
+  )
+
+  // Headline
+  font(ctx, 900, 150, -4)
+  ctx.fillStyle = C.text
+  ctx.fillText(s.cleared ? 'DECK' : `${s.flipped} CARDS`, PAD, 520)
+  ctx.fillStyle = C.accent
+  ctx.fillText(s.cleared ? 'CLEARED' : 'DOWN', PAD, 660)
+
+  // Stat tiles
+  const stats: [string, string][] = [
+    ['TIME', formatDuration(s.timeMs)],
+    ['CARDS', `${s.flipped}/${s.deckLength}`],
+    ['REPS', String(s.reps)],
+  ]
+  const gap = 24
+  const tileW = (inner - gap * 2) / 3
+  stats.forEach(([label, value], i) => {
+    const tx = PAD + i * (tileW + gap)
+    panel(ctx, tx, 740, tileW, 200, 32, C.panel)
+    ctx.textAlign = 'center'
+    font(ctx, 700, 28, 4)
+    ctx.fillStyle = C.muted
+    ctx.fillText(label, tx + tileW / 2, 805)
+    font(ctx, 900, 72, -2)
+    ctx.fillStyle = C.text
+    ctx.fillText(fitText(ctx, value, tileW - 32), tx + tileW / 2, 895)
+  })
+  ctx.textAlign = 'left'
+
+  // Breakdown
+  // 4 suits + ace = at most 5 distinct moves.
+  const rows = s.totals.slice(0, 5)
+  const rowH = 104
+  const listTop = 990
+  panel(ctx, PAD, listTop, inner, 100 + rows.length * rowH, 40, C.panel)
+  font(ctx, 700, 28, 4)
+  ctx.fillStyle = C.muted
+  ctx.fillText('BREAKDOWN', PAD + 48, listTop + 76)
+
+  rows.forEach((t, i) => {
+    const y = listTop + 150 + i * rowH
+    const left = PAD + 48
+    const right = PAD + inner - 48
+    font(ctx, 900, 52, -1)
+    ctx.fillStyle = C.text
+    ctx.textAlign = 'right'
+    ctx.fillText(String(t.done), right, y)
+    const repsW = ctx.measureText(String(t.done)).width
+    ctx.textAlign = 'left'
+    font(ctx, 600, 44)
+    ctx.fillText(fitText(ctx, t.move, right - left - repsW - 32), left, y)
+
+    const barW = right - left
+    panel(ctx, left, y + 24, barW, 12, 6, C.track)
+    const pct = t.total ? t.done / t.total : 0
+    if (pct > 0) panel(ctx, left, y + 24, Math.max(12, barW * pct), 12, 6, C.accent)
+  })
+
+  // Call to action
+  const ctaY = SHARE_HEIGHT - 200
+  font(ctx, 800, 48, -1)
+  ctx.fillStyle = C.text
+  ctx.textAlign = 'center'
+  ctx.fillText('Think you can beat it?', W / 2, ctaY)
+  font(ctx, 700, 38)
+  const label = fitText(ctx, s.url, inner - 80)
+  const pillW = ctx.measureText(label).width + 80
+  panel(ctx, (W - pillW) / 2, ctaY + 40, pillW, 84, 42, C.accent)
+  ctx.fillStyle = C.bg
+  ctx.fillText(label, W / 2, ctaY + 96)
+  ctx.textAlign = 'left'
+}
+
+export async function renderShareCard(stats: ShareStats): Promise<Blob> {
+  const canvas = document.createElement('canvas')
+  canvas.width = SHARE_WIDTH
+  canvas.height = SHARE_HEIGHT
+  drawShareCard(canvas.getContext('2d')!, stats)
+  return new Promise((resolve, reject) =>
+    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('Could not render image'))), 'image/png'),
+  )
+}
