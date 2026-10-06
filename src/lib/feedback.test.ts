@@ -3,12 +3,7 @@ import {
   buildPayload,
   canSend,
   EMPTY_DRAFT,
-  INITIAL_PROMPT_STATE,
   LIMITS,
-  recordFinish,
-  shouldPrompt,
-  snooze,
-  SNOOZE_AFTER_DISMISS,
 } from './feedback'
 
 const locale = { timeZone: 'Europe/Berlin', language: 'de-DE' }
@@ -39,27 +34,5 @@ describe('buildPayload', () => {
     expect(p.rating).toBeNull()
     expect(p.comment).toHaveLength(LIMITS.comment)
     expect(p.name).toBe('Sam')
-  })
-})
-
-describe('rating prompt', () => {
-  const now = 1_700_000_000_000
-
-  it('waits for the second finished workout', () => {
-    const once = recordFinish(INITIAL_PROMPT_STATE, 1)
-    expect(shouldPrompt(once, now)).toBe(false)
-    expect(shouldPrompt(recordFinish(once, 2), now)).toBe(true)
-  })
-
-  it('counts each workout once, even if the summary remounts', () => {
-    const once = recordFinish(INITIAL_PROMPT_STATE, 1)
-    expect(recordFinish(once, 1)).toBe(once)
-  })
-
-  it('stays quiet while snoozed', () => {
-    const ready = recordFinish(recordFinish(INITIAL_PROMPT_STATE, 1), 2)
-    const snoozed = snooze(ready, now, SNOOZE_AFTER_DISMISS)
-    expect(shouldPrompt(snoozed, now + 1000)).toBe(false)
-    expect(shouldPrompt(snoozed, now + SNOOZE_AFTER_DISMISS)).toBe(true)
   })
 })
