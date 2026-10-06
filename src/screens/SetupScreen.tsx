@@ -3,6 +3,7 @@ import { BrandHero } from '../components/BrandHero'
 import { Button } from '../components/Button'
 import { ExerciseSelect } from '../components/ExerciseSelect'
 import { ExternalLink } from '../components/ExternalLink'
+import { FeedbackSheet } from '../components/FeedbackSheet'
 import { IntroSheet } from '../components/IntroSheet'
 import { Segmented } from '../components/Segmented'
 import { SuitBadge } from '../components/SuitBadge'
@@ -12,6 +13,7 @@ import { useLocalStorage } from '../hooks/useLocalStorage'
 import { BRAND } from '../lib/brand'
 import { ACE_REPS, SUIT_LABEL, SUITS } from '../lib/deck'
 import { randomMoves, toMovePool, type MovePool } from '../lib/exercises'
+import { feedbackEnabled } from '../lib/feedback'
 import { DEFAULT_SETTINGS, TIMER_PRESETS } from '../lib/settings'
 import type { Settings } from '../lib/types'
 
@@ -37,6 +39,7 @@ export function SetupScreen({ settings, onChange, onStart }: Props) {
     setIntroOpen(false)
     setIntroSeen(true)
   }
+  const [feedbackOpen, setFeedbackOpen] = useState(false)
   const [storedPool, setPool] = useLocalStorage<MovePool>('cw:shuffle-pool:v1', 'bodyweight')
   const pool = toMovePool(storedPool)
   // Bumped on every shuffle so each ExerciseSelect remounts and drops any open "Custom…" input.
@@ -228,6 +231,18 @@ export function SetupScreen({ settings, onChange, onStart }: Props) {
           </ul>
         </details>
 
+        {feedbackEnabled && (
+          <>
+            <button
+              type="button"
+              onClick={() => setFeedbackOpen(true)}
+              className="mx-auto text-sm text-base-400 underline-offset-4 hover:text-base-100 hover:underline focus-visible:outline-2 focus-visible:outline-accent"
+            >
+              Found a bug or have an idea? Send feedback
+            </button>
+            <FeedbackSheet open={feedbackOpen} onClose={() => setFeedbackOpen(false)} source="setup" />
+          </>
+        )}
         <p className="text-center text-sm text-base-400">
           Made by <ExternalLink href={BRAND.creatorUrl}>{BRAND.creator}</ExternalLink> ·{' '}
           <ExternalLink href={BRAND.tipUrl}>Buy me a coffee ☕</ExternalLink>

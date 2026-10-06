@@ -26,6 +26,10 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
+        env:
+          # Google Apps Script web app URL (repo Settings → Secrets and variables → Actions → Variables).
+          # Unset = the feedback UI is hidden.
+          VITE_FEEDBACK_URL: ${{ vars.FEEDBACK_URL }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

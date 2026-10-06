@@ -1,10 +1,22 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '../components/Button'
 import { ExternalLink } from '../components/ExternalLink'
+import { FeedbackSheet, Stars } from '../components/FeedbackSheet'
 import { MoveTotals } from '../components/MoveTotals'
 import { ShareSheet } from '../components/ShareSheet'
+import { useLocalStorage } from '../hooks/useLocalStorage'
 import { BRAND } from '../lib/brand'
 import { moveTotals } from '../lib/deck'
+import {
+  feedbackEnabled,
+  INITIAL_PROMPT_STATE,
+  recordFinish,
+  shouldPrompt,
+  snooze,
+  SNOOZE_AFTER_DISMISS,
+  SNOOZE_AFTER_SEND,
+  type PromptState,
+} from '../lib/feedback'
 import { formatDuration } from '../lib/format'
 import type { Session } from '../hooks/useSession'
 
@@ -22,6 +34,28 @@ export function SummaryScreen({ session, onRestart, onDone }: Props) {
   const cleared = flipped === deck.length
   const countdownMs = settings.timerMinutes * 60_000
   const beatClock = settings.timerMode === 'down' && cleared && clock.accumulatedMs <= countdownMs
+
+  const [prompt, setPrompt] = useLocalStorage<PromptState>('cw:feedback-prompt:v1', INITIAL_PROMPT_STATE)
+  useEffect(() => {
+    if (finishedAt) setPrompt((p) => recordFinish(p, finishedAt))
+  }, [finishedAt, setPrompt])
+  // Decided once per summary so the card doesn't vanish mid-sheet when sending snoozes it.
+  const [askForRating] = useState(() => feedbackEnabled && shouldPrompt(recordFinish(prompt, finishedAt ?? 0), Date.now()))
+  const [cardState, setCardState] = useState<'ask' | 'dismissed' | 'thanked'>('ask')
+  const [feedbackRating, setFeedbackRating] = useState(0)
+  const [feedbackOpen, setFeedbackOpen] = useState(false)
+  const openFeedback = (rating: number) => {
+    setFeedbackRating(rating)
+    setFeedbackOpen(true)
+  }
+  const dismissCard = () => {
+    setCardState('dismissed')
+    setPrompt((p) => snooze(p, Date.now(), SNOOZE_AFTER_DISMISS))
+  }
+  const onFeedbackSent = () => {
+    setCardState('thanked')
+    setPrompt((p) => snooze(p, Date.now(), SNOOZE_AFTER_SEND))
+  }
 
   const stats = [
     ['Time', formatDuration(clock.accumulatedMs)],
@@ -59,6 +93,30 @@ export function SummaryScreen({ session, onRestart, onDone }: Props) {
         <MoveTotals totals={totals} />
       </section>
 
+      {askForRating && cardState !== 'dismissed' && (
+        <section className="relative mt-4 flex flex-col items-center rounded-2xl bg-base-900/60 p-4 text-center ring-1 ring-base-800">
+          {cardState === 'thanked' ? (
+            <p className="py-2 text-sm font-semibold text-base-300">Thanks for the feedback! 🙏</p>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={dismissCard}
+                aria-label="No thanks"
+                className="absolute top-2 right-2 grid size-8 place-items-center rounded-full text-base-400 hover:bg-base-800 hover:text-base-100 focus-visible:outline-2 focus-visible:outline-accent"
+              >
+                <svg viewBox="0 0 20 20" fill="currentColor" className="size-4" aria-hidden>
+                  <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
+                </svg>
+              </button>
+              <h2 className="text-sm font-bold">How was that burn?</h2>
+              <p className="mb-2 text-xs text-base-400">Tap a star. Takes ten seconds.</p>
+              <Stars value={feedbackRating} onChange={openFeedback} size="md" />
+            </>
+          )}
+        </section>
+      )}
+
       <div className="mt-auto flex flex-col gap-2 pt-8">
         <Button variant="primary" size="lg" onClick={() => setShareOpen(true)}>
           <svg viewBox="0 0 20 20" fill="currentColor" className="size-5" aria-hidden>
@@ -90,6 +148,17 @@ export function SummaryScreen({ session, onRestart, onDone }: Props) {
           date: new Date(finishedAt ?? Date.now()),
         }}
       />
+
+      {feedbackEnabled && (
+        <FeedbackSheet
+          open={feedbackOpen}
+          onClose={() => setFeedbackOpen(false)}
+          source="summary"
+          initialRating={feedbackRating}
+          workout={{ cleared, flipped, deckLength: deck.length, reps, timeMs: clock.accumulatedMs }}
+          onSent={onFeedbackSent}
+        />
+      )}
     </div>
   )
 }
