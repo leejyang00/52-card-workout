@@ -1,5 +1,7 @@
+import { useState } from 'react'
 import { Button } from '../components/Button'
 import { MoveTotals } from '../components/MoveTotals'
+import { ShareSheet } from '../components/ShareSheet'
 import { moveTotals } from '../lib/deck'
 import { formatDuration } from '../lib/format'
 import type { Session } from '../hooks/useSession'
@@ -11,7 +13,8 @@ interface Props {
 }
 
 export function SummaryScreen({ session, onRestart, onDone }: Props) {
-  const { deck, flipped, settings, clock } = session
+  const { deck, flipped, settings, clock, finishedAt } = session
+  const [shareOpen, setShareOpen] = useState(false)
   const totals = moveTotals(deck, flipped, settings)
   const reps = totals.reduce((sum, t) => sum + t.done, 0)
   const cleared = flipped === deck.length
@@ -55,13 +58,33 @@ export function SummaryScreen({ session, onRestart, onDone }: Props) {
       </section>
 
       <div className="mt-auto flex flex-col gap-2 pt-8">
-        <Button variant="primary" size="lg" onClick={onRestart}>
+        <Button variant="primary" size="lg" onClick={() => setShareOpen(true)}>
+          <svg viewBox="0 0 20 20" fill="currentColor" className="size-5" aria-hidden>
+            <path d="M13 4.5a2.5 2.5 0 1 1 .7 1.74l-6.8 3.4a2.5 2.5 0 0 1 0 .72l6.8 3.4a2.5 2.5 0 1 1-.67 1.34l-6.8-3.4a2.5 2.5 0 1 1 0-3.4l6.8-3.4A2.5 2.5 0 0 1 13 4.5Z" />
+          </svg>
+          Share workout
+        </Button>
+        <Button size="lg" onClick={onRestart}>
           Same moves, new shuffle
         </Button>
         <Button variant="ghost" size="lg" onClick={onDone}>
           Change setup
         </Button>
       </div>
+
+      <ShareSheet
+        open={shareOpen}
+        onClose={() => setShareOpen(false)}
+        stats={{
+          cleared,
+          timeMs: clock.accumulatedMs,
+          flipped,
+          deckLength: deck.length,
+          reps,
+          totals,
+          date: new Date(finishedAt ?? Date.now()),
+        }}
+      />
     </div>
   )
 }
