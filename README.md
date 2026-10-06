@@ -2,7 +2,7 @@
 
 *Flip. Burn. Repeat.* Shuffle a deck, flip one card at a time, do the reps, no skipping. No cards or gym needed: the site deals a virtual deck, keeps time, and tracks every rep. Built for a quick 30–60 minute session with bodyweight or free weights, anywhere.
 
-**🔗 Live:** https://leejyang00.github.io/52-card-workout/
+**🔗 Live:** https://burno.app
 
 ## How it works
 
@@ -30,7 +30,7 @@ The product name and tagline live in `src/lib/brand.ts`, so a rebrand is a one-f
 
 ```sh
 npm install
-npm run dev      # http://localhost:5173/52-card-workout/
+npm run dev      # http://localhost:5173/
 npm test         # deck/reps logic (Vitest)
 npm run build    # type-check + production build to dist/
 ```
