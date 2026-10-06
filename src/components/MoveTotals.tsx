@@ -9,12 +9,12 @@ export function MoveTotals({ totals }: { totals: MoveTotal[] }) {
           <li key={t.move}>
             <div className="mb-1 flex items-baseline justify-between gap-2 text-sm">
               <span className="truncate font-medium">{t.move}</span>
-              <span className="tabular shrink-0 text-stone-400">
-                <b className="text-stone-100">{t.done}</b> / {t.total}
+              <span className="tabular shrink-0 text-base-400">
+                <b className="text-base-100">{t.done}</b> / {t.total}
               </span>
             </div>
             <div
-              className="h-1.5 overflow-hidden rounded-full bg-stone-800"
+              className="h-1.5 overflow-hidden rounded-full bg-base-800"
               role="progressbar"
               aria-label={`${t.move} progress`}
               aria-valuenow={pct}

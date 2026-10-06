@@ -3,9 +3,9 @@ import type { ButtonHTMLAttributes } from 'react'
 type Variant = 'primary' | 'secondary' | 'ghost'
 
 const VARIANTS: Record<Variant, string> = {
-  primary: 'bg-accent text-stone-950 hover:bg-accent-strong active:bg-accent-strong',
-  secondary: 'bg-stone-800 text-stone-100 hover:bg-stone-700 active:bg-stone-700',
-  ghost: 'text-stone-300 hover:bg-stone-800/70 hover:text-stone-100',
+  primary: 'bg-accent text-on-accent hover:bg-accent-strong active:bg-accent-strong',
+  secondary: 'bg-base-800 text-base-100 hover:bg-base-700 active:bg-base-700',
+  ghost: 'text-base-300 hover:bg-base-800/70 hover:text-base-100',
 }
 
 interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {

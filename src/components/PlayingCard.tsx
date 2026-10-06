@@ -7,7 +7,7 @@ export function PlayingCard({ card }: { card: Card }) {
   if (card.kind === 'joker') {
     return (
       <div
-        className={`${SIZE} flex flex-col items-center justify-center gap-2 bg-white text-stone-950 shadow-2xl shadow-black/50 motion-safe:animate-flip-in`}
+        className={`${SIZE} flex flex-col items-center justify-center gap-2 bg-white text-card-ink shadow-2xl shadow-black/50 motion-safe:animate-flip-in`}
       >
         <span className="text-6xl">🃏</span>
         <span className="text-lg font-black tracking-[0.3em]">JOKER</span>
@@ -15,7 +15,7 @@ export function PlayingCard({ card }: { card: Card }) {
     )
   }
 
-  const color = isRed(card.suit) ? 'text-suit-red' : 'text-stone-950'
+  const color = isRed(card.suit) ? 'text-suit-red' : 'text-card-ink'
   const symbol = SUIT_SYMBOL[card.suit]
   const corner = (
     <span className="flex flex-col items-center leading-none">
@@ -40,10 +40,10 @@ export function PlayingCard({ card }: { card: Card }) {
 export function CardBack({ remaining }: { remaining: number }) {
   return (
     <div
-      className={`${SIZE} relative grid place-items-center bg-stone-800 p-2 shadow-2xl shadow-black/50 ring-1 ring-stone-700`}
+      className={`${SIZE} relative grid place-items-center bg-base-800 p-2 shadow-2xl shadow-black/50 ring-1 ring-base-700`}
     >
-      <div className="grid size-full place-items-center rounded-xl bg-[repeating-linear-gradient(45deg,var(--color-suit-red)_0_6px,#8f1220_6px_12px)]">
-        <span className="rounded-lg bg-stone-950/80 px-3 py-1 text-sm font-semibold text-stone-100">
+      <div className="grid size-full place-items-center rounded-xl bg-[repeating-linear-gradient(45deg,var(--color-cardback)_0_6px,var(--color-cardback-2)_6px_12px)]">
+        <span className="rounded-lg bg-base-950/80 px-3 py-1 text-sm font-semibold text-base-100">
           {remaining} cards
         </span>
       </div>

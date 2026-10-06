@@ -1,15 +1,45 @@
 @import 'tailwindcss';
+@import '@fontsource-variable/archivo/wdth.css';
 
 @theme {
   --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+  /* Wordmark and big headlines only. Set [font-stretch:125%] for the wide cut. */
+  --font-display: 'Archivo Variable', ui-sans-serif, system-ui, sans-serif;
 
-  /* Carried over from the original sheet: card red and the Ace-row yellow. */
-  --color-suit-red: #c0182b;
-  --color-accent: #f4c542;
-  --color-accent-strong: #e0ad1f;
+  /*
+   * Sunrise palette. `base-*` is a warm, peach-tinted neutral scale (950 = page, 100 = text), so
+   * inputs and dividers sit between white and ink. Text on white cards uses `card-ink`, text on the
+   * accent uses `on-accent`. `flame` (tip), `flame-2` (base) and `flame-core` colour the logo in
+   * its hot-pink colourway.
+   */
+  --color-base-950: #fff3ea;
+  --color-base-900: #ffffff;
+  --color-base-800: #ffe1cc;
+  --color-base-700: #f8c7a6;
+  --color-base-500: #b08470;
+  --color-base-400: #7d5646;
+  --color-base-300: #523429;
+  --color-base-200: #36211a;
+  --color-base-100: #24140f;
+  --color-accent: #ff6326;
+  --color-accent-strong: #f0500f;
+  --color-on-accent: #24140f;
+  --color-pop: #ff9f1a;
+  --color-flame: #ffb03d;
+  --color-flame-2: #ff2d75;
+  --color-flame-core: #ffe0a0;
+  /* Selected pill in segmented controls. */
+  --color-select: #36211a;
+  --color-on-select: #ffffff;
+  --color-suit-red: #e11d48;
+  --color-card-ink: #111827;
+  --color-cardback: #ff6326;
+  --color-cardback-2: #f0500f;
 
   --animate-flip-in: flip-in 320ms cubic-bezier(0.2, 0.8, 0.2, 1);
   --animate-sheet-in: sheet-in 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --animate-deal: deal 420ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --animate-flicker: flicker 1.8s ease-in-out infinite;
 
   @keyframes sheet-in {
     from {
@@ -28,18 +58,59 @@
       opacity: 1;
     }
   }
+
+  /* Fanned cards sweep out from under the top card. */
+  @keyframes deal {
+    from {
+      rotate: 0deg;
+      translate: 0 0;
+    }
+  }
+
+  @keyframes flicker {
+    0%,
+    100% {
+      transform: scale(1, 1);
+    }
+    30% {
+      transform: scale(0.97, 1.05);
+    }
+    60% {
+      transform: scale(1.02, 0.97);
+    }
+  }
 }
 
 @layer base {
   html {
-    color-scheme: dark;
+    color-scheme: light;
     -webkit-tap-highlight-color: transparent;
   }
   body {
-    @apply min-h-dvh bg-stone-950 text-stone-100 antialiased;
+    @apply min-h-dvh bg-base-950 text-base-100 antialiased;
   }
   /* Tabular digits so the timer doesn't jitter as it ticks. */
   .tabular {
     font-variant-numeric: tabular-nums;
   }
+}
+
+/*
+ * Sunrise after dark: espresso browns with the same orange and hot-pink flame. index.html sets
+ * data-theme before first paint (see src/lib/theme.ts).
+ */
+[data-theme='dark'] {
+  color-scheme: dark;
+  --color-base-950: #170e0b;
+  --color-base-900: #22150f;
+  --color-base-800: #33221a;
+  --color-base-700: #4a3226;
+  --color-base-500: #8f6d5e;
+  --color-base-400: #c4a293;
+  --color-base-300: #e6cfc3;
+  --color-base-200: #f5e6dd;
+  --color-base-100: #fff3ea;
+  --color-accent-strong: #ff7a45;
+  --color-select: #fff3ea;
+  --color-on-select: #24140f;
 }

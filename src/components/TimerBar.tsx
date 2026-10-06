@@ -26,7 +26,7 @@ export function TimerBar({ elapsed, started, running, settings, onToggle }: Prop
         >
           {display}
         </p>
-        <p className="mt-1 text-xs font-semibold tracking-wider text-stone-400 uppercase">
+        <p className="mt-1 text-xs font-semibold tracking-wider text-base-400 uppercase">
           {running ? caption : started ? 'Paused' : 'Starts on first flip'}
         </p>
       </div>
@@ -35,7 +35,7 @@ export function TimerBar({ elapsed, started, running, settings, onToggle }: Prop
         onClick={onToggle}
         disabled={!started}
         aria-label={running ? 'Pause timer' : 'Resume timer'}
-        className="grid size-12 shrink-0 place-items-center rounded-full bg-stone-800 text-stone-100 transition-colors hover:bg-stone-700 disabled:opacity-30 focus-visible:outline-2 focus-visible:outline-accent"
+        className="grid size-12 shrink-0 place-items-center rounded-full bg-base-800 text-base-100 transition-colors hover:bg-base-700 disabled:opacity-30 focus-visible:outline-2 focus-visible:outline-accent"
       >
         {running ? (
           <svg viewBox="0 0 24 24" fill="currentColor" className="size-5" aria-hidden>

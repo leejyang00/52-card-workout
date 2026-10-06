@@ -1,6 +1,8 @@
 import { BRAND } from './brand'
 import type { MoveTotal } from './deck'
 import { formatDuration } from './format'
+import { FLAME_INNER, FLAME_OUTER, MARK_HEIGHT, MARK_WIDTH } from './logo'
+import { cssColor } from './palette'
 
 export interface ShareStats {
   cleared: boolean
@@ -17,25 +19,51 @@ export interface ShareStats {
 export const SHARE_WIDTH = 1080
 export const SHARE_HEIGHT = 1920
 
-const C = {
-  bg: '#0c0a09',
-  panel: '#1c1917',
-  track: '#292524',
-  text: '#f5f5f4',
-  muted: '#a8a29e',
-  red: '#c0182b',
-  accent: '#f4c542',
+/** The active palette's colours, so the image matches what's on screen. */
+function colors() {
+  return {
+    bg: cssColor('base-950'),
+    panel: cssColor('base-900'),
+    track: cssColor('base-800'),
+    text: cssColor('base-100'),
+    muted: cssColor('base-400'),
+    red: cssColor('suit-red'),
+    accent: cssColor('accent'),
+    onAccent: cssColor('on-accent'),
+    stripe: cssColor('cardback'),
+    stripe2: cssColor('cardback-2'),
+    flame: cssColor('flame'),
+    flame2: cssColor('flame-2'),
+    flameCore: cssColor('flame-core'),
+  }
 }
 const FONT = 'system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif'
-// U+FE0E asks for the text glyph so iOS doesn't swap suits for emoji.
-const SUITS: [string, string][] = [
-  ['♥︎', C.red],
-  ['♠︎', C.text],
-  ['♦︎', C.red],
-  ['♣︎', C.text],
-]
+const DISPLAY_FONT = `"Archivo Variable", ${FONT}`
 
 type Ctx = CanvasRenderingContext2D
+
+/** The logo card at (x, y), `scale` times its 80×100 size. */
+function drawMark(ctx: Ctx, x: number, y: number, scale: number, tip: string, base: string, core: string) {
+  ctx.save()
+  ctx.translate(x, y)
+  ctx.scale(scale, scale)
+  ctx.fillStyle = '#fff'
+  ctx.shadowColor = 'rgb(0 0 0 / 0.14)'
+  ctx.shadowBlur = 14
+  ctx.shadowOffsetY = 4
+  ctx.beginPath()
+  ctx.roundRect(3, 3, MARK_WIDTH - 6, MARK_HEIGHT - 6, 12)
+  ctx.fill()
+  ctx.shadowColor = 'transparent'
+  const grad = ctx.createLinearGradient(0, 87, 0, 12)
+  grad.addColorStop(0, base)
+  grad.addColorStop(1, tip)
+  ctx.fillStyle = grad
+  ctx.fill(new Path2D(FLAME_OUTER))
+  ctx.fillStyle = core
+  ctx.fill(new Path2D(FLAME_INNER))
+  ctx.restore()
+}
 
 function font(ctx: Ctx, weight: number, size: number, tracking = 0) {
   ctx.font = `${weight} ${size}px ${FONT}`
@@ -60,6 +88,7 @@ export function drawShareCard(ctx: Ctx, s: ShareStats) {
   const W = SHARE_WIDTH
   const PAD = 90
   const inner = W - PAD * 2
+  const C = colors()
 
   ctx.fillStyle = C.bg
   ctx.fillRect(0, 0, W, SHARE_HEIGHT)
@@ -70,7 +99,7 @@ export function drawShareCard(ctx: Ctx, s: ShareStats) {
   ctx.rect(0, 0, W, 28)
   ctx.clip()
   for (let x = -40; x < W + 40; x += 24) {
-    ctx.fillStyle = (x / 24) % 2 === 0 ? C.red : '#8f1220'
+    ctx.fillStyle = (x / 24) % 2 === 0 ? C.stripe : C.stripe2
     ctx.beginPath()
     ctx.moveTo(x, 0)
     ctx.lineTo(x + 12, 0)
@@ -84,16 +113,13 @@ export function drawShareCard(ctx: Ctx, s: ShareStats) {
   ctx.textAlign = 'left'
 
   // Brand + date
-  font(ctx, 400, 56)
-  let x = PAD
-  for (const [glyph, color] of SUITS) {
-    ctx.fillStyle = color
-    ctx.fillText(glyph, x, 170)
-    x += 72
-  }
-  font(ctx, 900, 60, -1)
+  drawMark(ctx, PAD, 110, 1.3, C.flame, C.flame2, C.flameCore)
+  ctx.font = `900 112px ${DISPLAY_FONT}`
+  if ('fontStretch' in ctx) ctx.fontStretch = 'expanded'
+  if ('letterSpacing' in ctx) ctx.letterSpacing = '-2px'
   ctx.fillStyle = C.text
-  ctx.fillText(BRAND.name, PAD, 260)
+  ctx.fillText(BRAND.name.toUpperCase(), PAD + 136, 232)
+  if ('fontStretch' in ctx) ctx.fontStretch = 'normal'
   font(ctx, 500, 36)
   ctx.fillStyle = C.muted
   ctx.fillText(
@@ -169,7 +195,7 @@ export function drawShareCard(ctx: Ctx, s: ShareStats) {
   const label = fitText(ctx, s.url, inner - 80)
   const pillW = ctx.measureText(label).width + 80
   panel(ctx, (W - pillW) / 2, ctaY + 40, pillW, 84, 42, C.accent)
-  ctx.fillStyle = C.bg
+  ctx.fillStyle = C.onAccent
   ctx.fillText(label, W / 2, ctaY + 96)
   ctx.textAlign = 'left'
 }
@@ -178,6 +204,8 @@ export async function renderShareCard(stats: ShareStats): Promise<Blob> {
   const canvas = document.createElement('canvas')
   canvas.width = SHARE_WIDTH
   canvas.height = SHARE_HEIGHT
+  // Canvas won't wait for a webfont, so make sure the wordmark face is ready first.
+  await document.fonts.load(`900 112px ${DISPLAY_FONT}`).catch(() => {})
   drawShareCard(canvas.getContext('2d')!, stats)
   return new Promise((resolve, reject) =>
     canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('Could not render image'))), 'image/png'),
