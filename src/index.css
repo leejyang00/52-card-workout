@@ -94,3 +94,23 @@
     font-variant-numeric: tabular-nums;
   }
 }
+
+/*
+ * Sunrise after dark: espresso browns with the same orange and hot-pink flame. index.html sets
+ * data-theme before first paint (see src/lib/theme.ts).
+ */
+[data-theme='dark'] {
+  color-scheme: dark;
+  --color-base-950: #170e0b;
+  --color-base-900: #22150f;
+  --color-base-800: #33221a;
+  --color-base-700: #4a3226;
+  --color-base-500: #8f6d5e;
+  --color-base-400: #c4a293;
+  --color-base-300: #e6cfc3;
+  --color-base-200: #f5e6dd;
+  --color-base-100: #fff3ea;
+  --color-accent-strong: #ff7a45;
+  --color-select: #fff3ea;
+  --color-on-select: #24140f;
+}
