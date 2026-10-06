@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { BrandHero } from '../components/BrandHero'
 import { Button } from '../components/Button'
 import { ExerciseSelect } from '../components/ExerciseSelect'
+import { FeedbackSheet } from '../components/FeedbackSheet'
 import { IntroSheet } from '../components/IntroSheet'
 import { Segmented } from '../components/Segmented'
 import { SuitBadge } from '../components/SuitBadge'
@@ -10,6 +11,7 @@ import { Toggle } from '../components/Toggle'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import { ACE_REPS, SUIT_LABEL, SUITS } from '../lib/deck'
 import { randomMoves, toMovePool, type MovePool } from '../lib/exercises'
+import { feedbackEnabled } from '../lib/feedback'
 import { DEFAULT_SETTINGS, TIMER_PRESETS } from '../lib/settings'
 import type { Settings } from '../lib/types'
 
@@ -35,6 +37,7 @@ export function SetupScreen({ settings, onChange, onStart }: Props) {
     setIntroOpen(false)
     setIntroSeen(true)
   }
+  const [feedbackOpen, setFeedbackOpen] = useState(false)
   const [storedPool, setPool] = useLocalStorage<MovePool>('cw:shuffle-pool:v1', 'bodyweight')
   const pool = toMovePool(storedPool)
   // Bumped on every shuffle so each ExerciseSelect remounts and drops any open "Custom…" input.
@@ -225,6 +228,19 @@ export function SetupScreen({ settings, onChange, onStart }: Props) {
             </li>
           </ul>
         </details>
+
+        {feedbackEnabled && (
+          <>
+            <button
+              type="button"
+              onClick={() => setFeedbackOpen(true)}
+              className="mx-auto text-sm text-base-400 underline-offset-4 hover:text-base-100 hover:underline focus-visible:outline-2 focus-visible:outline-accent"
+            >
+              Found a bug or have an idea? Send feedback
+            </button>
+            <FeedbackSheet open={feedbackOpen} onClose={() => setFeedbackOpen(false)} source="setup" />
+          </>
+        )}
       </div>
 
       <div className="fixed inset-x-0 bottom-0 bg-gradient-to-t from-base-950 via-base-950/95 to-transparent px-4 pt-6 pb-[max(1rem,env(safe-area-inset-bottom))]">

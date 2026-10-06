@@ -50,3 +50,26 @@ src/
 Pushing to `main` runs `.github/workflows/deploy.yml`, which tests, builds and publishes `dist/` to GitHub Pages. In repo **Settings → Pages**, the source must be **GitHub Actions**.
 
 `public/52-card-workout.pdf` is the original printable one-page sheet.
+
+## Feedback → Google Sheet
+
+People can rate Burno (1–5 stars) with an optional note, first name and email. Anonymous is the default. Feedback can be sent from two places:
+
+- **After a workout:** a small card on the summary screen, shown from the second finished workout on. It snoozes for 30 days if dismissed and 90 days after sending.
+- **Any time:** "Send feedback" at the bottom of the setup screen.
+
+Nothing appears during a workout. Each row also gets the person's time zone and language (a rough location, no IP), plus the workout's stats when sent from the summary. With no endpoint configured, the feedback UI is hidden.
+
+**One-time setup:**
+
+1. In Google Sheets, create a blank spreadsheet (e.g. "Burno feedback").
+2. **Extensions → Apps Script**, replace the code with [`feedback/apps-script.gs`](feedback/apps-script.gs), and save.
+3. **Deploy → New deployment →** type **Web app**. Execute as: **Me**. Who has access: **Anyone**. Deploy and approve access when asked.
+4. Copy the web app URL (`https://script.google.com/macros/s/…/exec`). Opening it in a browser should show `{"ok":true,…}`.
+5. Save it as a repo variable, then redeploy (push to `main` or re-run the workflow):
+
+   ```sh
+   gh variable set FEEDBACK_URL --body "https://script.google.com/macros/s/…/exec"
+   ```
+
+The first submission creates a **Feedback** tab with headers. For local testing, put `VITE_FEEDBACK_URL=…` in `.env.local`. After editing the script, use **Deploy → Manage deployments → Edit → New version** so the URL stays the same.
