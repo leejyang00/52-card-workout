@@ -30,7 +30,7 @@ export function ExerciseSelect({ value, onChange, label }: Props) {
               onChange(e.target.value)
             }
           }}
-          className="h-11 w-full appearance-none truncate rounded-xl bg-stone-800 pr-10 pl-3 text-base font-semibold text-stone-100 ring-1 ring-stone-700 focus:ring-2 focus:ring-accent focus:outline-none"
+          className="h-11 w-full appearance-none truncate rounded-xl bg-base-800 pr-10 pl-3 text-base font-semibold text-base-100 ring-1 ring-base-700 focus:ring-2 focus:ring-accent focus:outline-none"
         >
           {EXERCISE_GROUPS.map((group) => (
             <optgroup key={group.label} label={group.label}>
@@ -47,7 +47,7 @@ export function ExerciseSelect({ value, onChange, label }: Props) {
           aria-hidden
           viewBox="0 0 20 20"
           fill="currentColor"
-          className="pointer-events-none absolute top-1/2 right-3 size-5 -translate-y-1/2 text-stone-400"
+          className="pointer-events-none absolute top-1/2 right-3 size-5 -translate-y-1/2 text-base-400"
         >
           <path d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.17l3.71-3.94a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z" />
         </svg>
@@ -64,7 +64,7 @@ export function ExerciseSelect({ value, onChange, label }: Props) {
             maxLength={40}
             onChange={(e) => onChange(e.target.value)}
             placeholder="e.g. Box jumps"
-            className="h-11 w-full rounded-xl bg-stone-900 px-3 text-base text-stone-100 ring-1 ring-stone-700 placeholder:text-stone-500 focus:ring-2 focus:ring-accent focus:outline-none"
+            className="h-11 w-full rounded-xl bg-base-900 px-3 text-base text-base-100 ring-1 ring-base-700 placeholder:text-base-500 focus:ring-2 focus:ring-accent focus:outline-none"
           />
         </>
       )}

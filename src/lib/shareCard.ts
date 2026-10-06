@@ -1,6 +1,7 @@
 import { BRAND } from './brand'
 import type { MoveTotal } from './deck'
 import { formatDuration } from './format'
+import { cssColor } from './palette'
 
 export interface ShareStats {
   cleared: boolean
@@ -17,23 +18,24 @@ export interface ShareStats {
 export const SHARE_WIDTH = 1080
 export const SHARE_HEIGHT = 1920
 
-const C = {
-  bg: '#0c0a09',
-  panel: '#1c1917',
-  track: '#292524',
-  text: '#f5f5f4',
-  muted: '#a8a29e',
-  red: '#c0182b',
-  accent: '#f4c542',
+/** The active palette's colours, so the image matches what's on screen. */
+function colors() {
+  return {
+    bg: cssColor('base-950'),
+    panel: cssColor('base-900'),
+    track: cssColor('base-800'),
+    text: cssColor('base-100'),
+    muted: cssColor('base-400'),
+    red: cssColor('suit-red'),
+    accent: cssColor('accent'),
+    onAccent: cssColor('on-accent'),
+    stripe: cssColor('cardback'),
+    stripe2: cssColor('cardback-2'),
+  }
 }
 const FONT = 'system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif'
-// U+FE0E asks for the text glyph so iOS doesn't swap suits for emoji.
-const SUITS: [string, string][] = [
-  ['♥︎', C.red],
-  ['♠︎', C.text],
-  ['♦︎', C.red],
-  ['♣︎', C.text],
-]
+// U+FE0E asks for the text glyph so iOS doesn't swap suits for emoji. Hearts and diamonds are red.
+const SUITS = ['♥︎', '♠︎', '♦︎', '♣︎']
 
 type Ctx = CanvasRenderingContext2D
 
@@ -60,6 +62,7 @@ export function drawShareCard(ctx: Ctx, s: ShareStats) {
   const W = SHARE_WIDTH
   const PAD = 90
   const inner = W - PAD * 2
+  const C = colors()
 
   ctx.fillStyle = C.bg
   ctx.fillRect(0, 0, W, SHARE_HEIGHT)
@@ -70,7 +73,7 @@ export function drawShareCard(ctx: Ctx, s: ShareStats) {
   ctx.rect(0, 0, W, 28)
   ctx.clip()
   for (let x = -40; x < W + 40; x += 24) {
-    ctx.fillStyle = (x / 24) % 2 === 0 ? C.red : '#8f1220'
+    ctx.fillStyle = (x / 24) % 2 === 0 ? C.stripe : C.stripe2
     ctx.beginPath()
     ctx.moveTo(x, 0)
     ctx.lineTo(x + 12, 0)
@@ -86,8 +89,8 @@ export function drawShareCard(ctx: Ctx, s: ShareStats) {
   // Brand + date
   font(ctx, 400, 56)
   let x = PAD
-  for (const [glyph, color] of SUITS) {
-    ctx.fillStyle = color
+  for (const [i, glyph] of SUITS.entries()) {
+    ctx.fillStyle = i % 2 === 0 ? C.red : C.text
     ctx.fillText(glyph, x, 170)
     x += 72
   }
@@ -169,7 +172,7 @@ export function drawShareCard(ctx: Ctx, s: ShareStats) {
   const label = fitText(ctx, s.url, inner - 80)
   const pillW = ctx.measureText(label).width + 80
   panel(ctx, (W - pillW) / 2, ctaY + 40, pillW, 84, 42, C.accent)
-  ctx.fillStyle = C.bg
+  ctx.fillStyle = C.onAccent
   ctx.fillText(label, W / 2, ctaY + 96)
   ctx.textAlign = 'left'
 }

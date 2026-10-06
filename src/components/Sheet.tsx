@@ -48,9 +48,9 @@ export function Sheet({ open, onClose, title, children, footer }: Props) {
       onClose={onClose}
       // A click whose target is the <dialog> itself landed on the backdrop.
       onClick={(e) => e.target === ref.current && onClose()}
-      className="mx-auto mt-auto mb-0 max-h-[92vh] supports-[height:100dvh]:max-h-[92dvh] w-full max-w-none overflow-y-auto overscroll-contain rounded-t-3xl bg-stone-900 p-0 text-stone-100 ring-1 ring-stone-800 outline-none backdrop:bg-black/70 backdrop:backdrop-blur-sm sm:my-auto sm:max-w-lg sm:rounded-3xl motion-safe:open:animate-sheet-in"
+      className="mx-auto mt-auto mb-0 max-h-[92vh] supports-[height:100dvh]:max-h-[92dvh] w-full max-w-none overflow-y-auto overscroll-contain rounded-t-3xl bg-base-900 p-0 text-base-100 ring-1 ring-base-800 outline-none backdrop:bg-black/70 backdrop:backdrop-blur-sm sm:my-auto sm:max-w-lg sm:rounded-3xl motion-safe:open:animate-sheet-in"
     >
-      <header className="sticky top-0 z-10 flex items-center justify-between gap-4 bg-stone-900 px-5 pt-5 pb-2">
+      <header className="sticky top-0 z-10 flex items-center justify-between gap-4 bg-base-900 px-5 pt-5 pb-2">
         <h2 id={titleId} className="text-xl font-black">
           {title}
         </h2>
@@ -58,7 +58,7 @@ export function Sheet({ open, onClose, title, children, footer }: Props) {
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="grid size-10 place-items-center rounded-full text-stone-400 hover:bg-stone-800 hover:text-stone-100 focus-visible:outline-2 focus-visible:outline-accent"
+          className="grid size-10 place-items-center rounded-full text-base-400 hover:bg-base-800 hover:text-base-100 focus-visible:outline-2 focus-visible:outline-accent"
         >
           <svg viewBox="0 0 20 20" fill="currentColor" className="size-5" aria-hidden>
             <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
@@ -67,7 +67,7 @@ export function Sheet({ open, onClose, title, children, footer }: Props) {
       </header>
       <div className="px-5 pb-5">{children}</div>
       {footer && (
-        <div className="sticky bottom-0 z-10 border-t border-stone-800 bg-stone-900 px-5 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <div className="sticky bottom-0 z-10 border-t border-base-800 bg-base-900 px-5 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
           {footer}
         </div>
       )}

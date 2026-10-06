@@ -34,7 +34,7 @@ export function SummaryScreen({ session, onRestart, onDone }: Props) {
           {cleared ? '🏆' : '💪'}
         </p>
         <h1 className="mt-3 text-4xl font-black tracking-tight">{cleared ? 'Deck cleared!' : 'Workout ended'}</h1>
-        <p className="mt-2 text-stone-400">
+        <p className="mt-2 text-base-400">
           {beatClock
             ? `Under ${settings.timerMinutes} minutes. Nice.`
             : cleared
@@ -45,15 +45,15 @@ export function SummaryScreen({ session, onRestart, onDone }: Props) {
 
       <dl className="mt-8 grid grid-cols-3 gap-2">
         {stats.map(([label, value]) => (
-          <div key={label} className="rounded-2xl bg-stone-900/60 p-4 text-center ring-1 ring-stone-800">
-            <dt className="text-xs font-bold tracking-widest text-stone-400 uppercase">{label}</dt>
+          <div key={label} className="rounded-2xl bg-base-900/60 p-4 text-center ring-1 ring-base-800">
+            <dt className="text-xs font-bold tracking-widest text-base-400 uppercase">{label}</dt>
             <dd className="tabular mt-1 text-2xl font-black">{value}</dd>
           </div>
         ))}
       </dl>
 
-      <section className="mt-4 rounded-2xl bg-stone-900/60 p-4 ring-1 ring-stone-800">
-        <h2 className="mb-3 text-xs font-bold tracking-widest text-stone-400 uppercase">Breakdown</h2>
+      <section className="mt-4 rounded-2xl bg-base-900/60 p-4 ring-1 ring-base-800">
+        <h2 className="mb-3 text-xs font-bold tracking-widest text-base-400 uppercase">Breakdown</h2>
         <MoveTotals totals={totals} />
       </section>
 

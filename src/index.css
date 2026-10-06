@@ -3,10 +3,29 @@
 @theme {
   --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
 
-  /* Carried over from the original sheet: card red and the Ace-row yellow. */
-  --color-suit-red: #c0182b;
-  --color-accent: #f4c542;
-  --color-accent-strong: #e0ad1f;
+  /*
+   * Palette tokens. These defaults are the Volt palette; the others live in the [data-palette]
+   * blocks below and are picked in src/lib/palette.ts. `base-*` is the neutral scale (950 = page,
+   * 100 = text), so a light palette just flips it. Text on white cards uses `card-ink`, text on the
+   * accent uses `on-accent`, so neither flips with it.
+   */
+  --color-base-950: #0a0f1a;
+  --color-base-900: #121a2b;
+  --color-base-800: #1e2a40;
+  --color-base-700: #2c3b55;
+  --color-base-500: #64748b;
+  --color-base-400: #94a3b8;
+  --color-base-300: #cbd5e1;
+  --color-base-200: #e2e8f0;
+  --color-base-100: #f1f5f9;
+  --color-accent: #c6f432;
+  --color-accent-strong: #b2df1c;
+  --color-on-accent: #0a0f1a;
+  --color-pop: #38bdf8;
+  --color-suit-red: #e11d48;
+  --color-card-ink: #111827;
+  --color-cardback: #c6f432;
+  --color-cardback-2: #9fc81a;
 
   --animate-flip-in: flip-in 320ms cubic-bezier(0.2, 0.8, 0.2, 1);
   --animate-sheet-in: sheet-in 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -36,10 +55,89 @@
     -webkit-tap-highlight-color: transparent;
   }
   body {
-    @apply min-h-dvh bg-stone-950 text-stone-100 antialiased;
+    @apply min-h-dvh bg-base-950 text-base-100 antialiased;
   }
   /* Tabular digits so the timer doesn't jitter as it ticks. */
   .tabular {
     font-variant-numeric: tabular-nums;
   }
+}
+
+/* Keep in sync with PALETTES in src/lib/palette.ts. */
+[data-palette='ember'] {
+  --color-base-950: #140d12;
+  --color-base-900: #20161d;
+  --color-base-800: #31232c;
+  --color-base-700: #45323e;
+  --color-base-500: #7f6a77;
+  --color-base-400: #ad9aa6;
+  --color-base-300: #d7c9d1;
+  --color-base-200: #ece3e8;
+  --color-base-100: #faf4f7;
+  --color-accent: #ff6a2b;
+  --color-accent-strong: #f2541a;
+  --color-on-accent: #140d12;
+  --color-pop: #ffc53d;
+  --color-suit-red: #e11d48;
+  --color-cardback: #ff6a2b;
+  --color-cardback-2: #e04e14;
+}
+
+[data-palette='pulse'] {
+  --color-base-950: #0d0b22;
+  --color-base-900: #17143a;
+  --color-base-800: #252052;
+  --color-base-700: #352f6c;
+  --color-base-500: #6e69a8;
+  --color-base-400: #a29ed2;
+  --color-base-300: #d0cdee;
+  --color-base-200: #e7e5f8;
+  --color-base-100: #f5f4fd;
+  --color-accent: #2ee6c5;
+  --color-accent-strong: #17cdab;
+  --color-on-accent: #0d0b22;
+  --color-pop: #ff4fd8;
+  --color-suit-red: #e11d48;
+  --color-cardback: #7c5cff;
+  --color-cardback-2: #6140f0;
+}
+
+[data-palette='daylight'] {
+  color-scheme: light;
+  --color-base-950: #f4f6fb;
+  --color-base-900: #ffffff;
+  --color-base-800: #e5e9f2;
+  --color-base-700: #cdd3e0;
+  --color-base-500: #8a93a8;
+  --color-base-400: #576078;
+  --color-base-300: #384055;
+  --color-base-200: #232a3b;
+  --color-base-100: #0f1422;
+  --color-accent: #2554f5;
+  --color-accent-strong: #1a43d6;
+  --color-on-accent: #ffffff;
+  --color-pop: #ff6a2b;
+  --color-suit-red: #e11d48;
+  --color-cardback: #2554f5;
+  --color-cardback-2: #1a43d6;
+}
+
+/* The original gold-on-black look, kept for comparison. */
+[data-palette='classic'] {
+  --color-base-950: #0c0a09;
+  --color-base-900: #1c1917;
+  --color-base-800: #292524;
+  --color-base-700: #44403c;
+  --color-base-500: #78716c;
+  --color-base-400: #a8a29e;
+  --color-base-300: #d6d3d1;
+  --color-base-200: #e7e5e4;
+  --color-base-100: #f5f5f4;
+  --color-accent: #f4c542;
+  --color-accent-strong: #e0ad1f;
+  --color-on-accent: #0c0a09;
+  --color-pop: #f5f5f4;
+  --color-suit-red: #c0182b;
+  --color-cardback: #c0182b;
+  --color-cardback-2: #8f1220;
 }

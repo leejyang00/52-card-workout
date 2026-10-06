@@ -93,17 +93,17 @@ export function ShareSheet({ open, onClose, stats }: Props) {
               Copy caption
             </Button>
           </div>
-          <p role="status" className="min-h-5 text-center text-sm text-stone-400">
+          <p role="status" className="min-h-5 text-center text-sm text-base-400">
             {notice}
           </p>
         </div>
       }
     >
-      <div className="mx-auto aspect-[9/16] w-full max-w-60 overflow-hidden rounded-2xl bg-stone-950 ring-1 ring-stone-800">
+      <div className="mx-auto aspect-[9/16] w-full max-w-60 overflow-hidden rounded-2xl bg-base-950 ring-1 ring-base-800">
         {image ? (
           <img src={image.url} alt="Workout summary image" className="size-full" />
         ) : (
-          <div className="grid size-full place-items-center text-sm text-stone-500">Dealing your card…</div>
+          <div className="grid size-full place-items-center text-sm text-base-500">Dealing your card…</div>
         )}
       </div>
     </Sheet>

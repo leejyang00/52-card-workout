@@ -49,11 +49,11 @@ export function WorkoutScreen({ session, onFlip, onUndo, onPause, onResume, onFi
 
   return (
     <div className="mx-auto flex min-h-dvh max-w-5xl flex-col">
-      <header className="sticky top-0 z-10 border-b border-stone-800 bg-stone-950/90 px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 backdrop-blur">
+      <header className="sticky top-0 z-10 border-b border-base-800 bg-base-950/90 px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 backdrop-blur">
         <TimerBar elapsed={elapsed} started={flipped > 0} running={running} settings={settings} onToggle={running ? onPause : onResume} />
         <div className="mt-3 flex items-center gap-3">
           <div
-            className="h-2 flex-1 overflow-hidden rounded-full bg-stone-800"
+            className="h-2 flex-1 overflow-hidden rounded-full bg-base-800"
             role="progressbar"
             aria-label="Deck progress"
             aria-valuenow={flipped}
@@ -61,11 +61,11 @@ export function WorkoutScreen({ session, onFlip, onUndo, onPause, onResume, onFi
             aria-valuemax={deck.length}
           >
             <div
-              className="h-full rounded-full bg-stone-100 transition-[width] duration-300"
+              className="h-full rounded-full bg-pop transition-[width] duration-300"
               style={{ width: `${(flipped / deck.length) * 100}%` }}
             />
           </div>
-          <span className="tabular shrink-0 text-sm font-semibold text-stone-300">
+          <span className="tabular shrink-0 text-sm font-semibold text-base-300">
             {flipped} / {deck.length}
           </span>
         </div>
@@ -87,7 +87,7 @@ export function WorkoutScreen({ session, onFlip, onUndo, onPause, onResume, onFi
             {!task && (
               <>
                 <p className="text-2xl font-bold">Ready when you are</p>
-                <p className="mt-1 text-stone-400">Tap the deck or hit flip to draw your first card.</p>
+                <p className="mt-1 text-base-400">Tap the deck or hit flip to draw your first card.</p>
               </>
             )}
             {task?.kind === 'move' && (
@@ -95,7 +95,7 @@ export function WorkoutScreen({ session, onFlip, onUndo, onPause, onResume, onFi
                 <p className="text-5xl font-black sm:text-6xl">
                   <span className="tabular">{task.reps}</span> <span className="break-words">{task.move}</span>
                 </p>
-                <p className="mt-2 text-stone-400">
+                <p className="mt-2 text-base-400">
                   {[task.isAce && 'Ace wildcard', exerciseNote(task.move), current && isFaceCard(current) && 'Face card: breather after this']
                     .filter(Boolean)
                     .join(' · ')}
@@ -105,19 +105,19 @@ export function WorkoutScreen({ session, onFlip, onUndo, onPause, onResume, onFi
             {task?.kind === 'rest' && (
               <>
                 <p className="text-5xl font-black sm:text-6xl">Rest {JOKER_REST_SECONDS}s</p>
-                <p className="mt-2 text-stone-400">Or 30 sec of your hardest move. Dealer's choice.</p>
+                <p className="mt-2 text-base-400">Or 30 sec of your hardest move. Dealer's choice.</p>
               </>
             )}
           </div>
         </section>
 
         <aside className="flex flex-col gap-4">
-          <section className="rounded-2xl bg-stone-900/60 p-4 ring-1 ring-stone-800">
-            <h2 className="mb-3 text-xs font-bold tracking-widest text-stone-400 uppercase">Reps done</h2>
+          <section className="rounded-2xl bg-base-900/60 p-4 ring-1 ring-base-800">
+            <h2 className="mb-3 text-xs font-bold tracking-widest text-base-400 uppercase">Reps done</h2>
             <MoveTotals totals={moveTotals(deck, flipped, settings)} />
           </section>
-          <section className="rounded-2xl bg-stone-900/60 p-4 ring-1 ring-stone-800">
-            <h2 className="mb-3 text-xs font-bold tracking-widest text-stone-400 uppercase">
+          <section className="rounded-2xl bg-base-900/60 p-4 ring-1 ring-base-800">
+            <h2 className="mb-3 text-xs font-bold tracking-widest text-base-400 uppercase">
               Flipped · {remaining} left
             </h2>
             <DrawnPile cards={deck.slice(0, flipped)} />
@@ -125,7 +125,7 @@ export function WorkoutScreen({ session, onFlip, onUndo, onPause, onResume, onFi
         </aside>
       </main>
 
-      <div className="fixed inset-x-0 bottom-0 z-10 border-t border-stone-800 bg-stone-950/95 px-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur">
+      <div className="fixed inset-x-0 bottom-0 z-10 border-t border-base-800 bg-base-950/95 px-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur">
         <div className="mx-auto flex max-w-xl gap-2">
           <Button variant="ghost" size="lg" onClick={onUndo} disabled={flipped === 0} aria-label="Undo last flip">
             Undo

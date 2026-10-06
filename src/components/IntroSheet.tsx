@@ -26,7 +26,7 @@ export function IntroSheet({ open, onClose }: { open: boolean; onClose: () => vo
         </Button>
       }
     >
-      <p className="text-stone-300">
+      <p className="text-base-300">
         A full-body workout played with a deck of cards. No cards? No problem: we shuffle and deal for you, keep the
         time and count every rep.
       </p>
@@ -34,18 +34,18 @@ export function IntroSheet({ open, onClose }: { open: boolean; onClose: () => vo
       <ol className="mt-5 flex flex-col gap-3">
         {STEPS.map(([title, body], i) => (
           <li key={title} className="flex gap-3">
-            <span className="grid size-8 shrink-0 place-items-center rounded-full bg-accent text-sm font-black text-stone-950">
+            <span className="grid size-8 shrink-0 place-items-center rounded-full bg-accent text-sm font-black text-on-accent">
               {i + 1}
             </span>
             <span>
               <span className="block font-bold">{title}</span>
-              <span className="block text-sm text-stone-400">{body}</span>
+              <span className="block text-sm text-base-400">{body}</span>
             </span>
           </li>
         ))}
       </ol>
 
-      <ul className="mt-6 divide-y divide-stone-800 rounded-2xl bg-stone-800/50 px-4">
+      <ul className="mt-6 divide-y divide-base-800 rounded-2xl bg-base-800/50 px-4">
         {WAYS.map(([icon, title, body]) => (
           <li key={title} className="flex items-start gap-3 py-3">
             <span className="text-xl leading-6" aria-hidden>
@@ -53,26 +53,26 @@ export function IntroSheet({ open, onClose }: { open: boolean; onClose: () => vo
             </span>
             <span>
               <span className="block text-sm font-bold">{title}</span>
-              <span className="block text-sm text-stone-400">{body}</span>
+              <span className="block text-sm text-base-400">{body}</span>
             </span>
           </li>
         ))}
       </ul>
 
-      <figure className="mt-6 rounded-2xl border-l-4 border-accent bg-stone-800/30 p-4">
+      <figure className="mt-6 rounded-2xl border-l-4 border-accent bg-base-800/30 p-4">
         <figcaption className="mb-2 flex items-center gap-3">
           <span
             aria-hidden
-            className="grid size-9 place-items-center rounded-full bg-accent text-sm font-black text-stone-950"
+            className="grid size-9 place-items-center rounded-full bg-accent text-sm font-black text-on-accent"
           >
             {BRAND.creator[0]}
           </span>
           <span>
             <span className="block text-sm font-bold">From the creator</span>
-            <span className="block text-xs text-stone-400">{BRAND.creator}</span>
+            <span className="block text-xs text-base-400">{BRAND.creator}</span>
           </span>
         </figcaption>
-        <blockquote className="flex flex-col gap-2 text-sm text-stone-300">
+        <blockquote className="flex flex-col gap-2 text-sm text-base-300">
           <p>
             My schedule kept beating my gym plans. Some days there just isn't time to get to a gym, but there's always
             a bit of floor, and usually a pull-up bar somewhere nearby.
