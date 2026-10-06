@@ -13,6 +13,13 @@ interface Props {
 
 const FILE_NAME = 'my-workout.png'
 
+// Browsers can't write to the photo library directly. On iOS a download lands in
+// Files, but the share sheet offers "Save Image" which goes straight to Photos.
+// Android gallery apps already index the Download folder, so a download is best there.
+const isIOS =
+  /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+
 export function ShareSheet({ open, onClose, stats }: Props) {
   const [image, setImage] = useState<{ blob: Blob; url: string } | null>(null)
   const [notice, setNotice] = useState('')
@@ -39,6 +46,8 @@ export function ShareSheet({ open, onClose, stats }: Props) {
   const file = image && new File([image.blob], FILE_NAME, { type: 'image/png' })
   const canShareFile = !!file && !!navigator.canShare?.({ files: [file] })
 
+  const saveLabel = isIOS && canShareFile ? 'Save to Photos' : 'Save image'
+
   const share = async () => {
     if (!file) return
     try {
@@ -49,13 +58,27 @@ export function ShareSheet({ open, onClose, stats }: Props) {
     }
   }
 
-  const save = () => {
+  const save = async () => {
     if (!image) return
+    if (isIOS && canShareFile && file) {
+      try {
+        // Image only, no caption: with text attached iOS can hide "Save Image".
+        await navigator.share({ files: [file] })
+        return
+      } catch (e) {
+        if ((e as Error).name === 'AbortError') return
+        // Fall through to a plain download.
+      }
+    }
     const a = document.createElement('a')
     a.href = image.url
     a.download = FILE_NAME
     a.click()
-    setNotice('Image saved. Post it to your story or send it to a friend.')
+    setNotice(
+      isIOS
+        ? 'Saved to Files. To add it to Photos, press and hold the image above and tap "Save to Photos".'
+        : 'Image saved. Find it in your gallery or downloads, then post it or send it to a friend.',
+    )
   }
 
   const copy = async () => {
@@ -80,13 +103,13 @@ export function ShareSheet({ open, onClose, stats }: Props) {
             </Button>
           ) : (
             <Button variant="primary" size="lg" onClick={save} disabled={!image}>
-              Save image
+              {saveLabel}
             </Button>
           )}
           <div className="flex gap-2">
             {canShareFile && (
               <Button className="flex-1" onClick={save}>
-                Save image
+                {saveLabel}
               </Button>
             )}
             <Button className="flex-1" onClick={copy}>
