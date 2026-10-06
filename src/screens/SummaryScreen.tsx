@@ -112,9 +112,9 @@ export function SummaryScreen({ session, onRestart, onDone }: Props) {
           </Button>
           <Button className="whitespace-nowrap" onClick={onDone}>
             <svg viewBox="0 0 20 20" fill="currentColor" className="size-5 shrink-0" aria-hidden>
-              <path d="M10 3.75a.75.75 0 0 1 .75.75v.38a2.25 2.25 0 0 1 0 4.24v6.38a.75.75 0 0 1-1.5 0V9.12a2.25 2.25 0 0 1 0-4.24V4.5a.75.75 0 0 1 .75-.75Zm-5 0a.75.75 0 0 1 .75.75v5.63a2.25 2.25 0 0 1 0 4.24v1.13a.75.75 0 0 1-1.5 0v-1.13a2.25 2.25 0 0 1 0-4.24V4.5A.75.75 0 0 1 5 3.75Zm10 0a.75.75 0 0 1 .75.75v1.63a2.25 2.25 0 0 1 0 4.24v5.13a.75.75 0 0 1-1.5 0v-5.13a2.25 2.25 0 0 1 0-4.24V4.5a.75.75 0 0 1 .75-.75Z" />
+              <path d="M9.29 2.29a1 1 0 0 1 1.42 0l7 7A1 1 0 0 1 17 11h-1v6a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-6H3a1 1 0 0 1-.7-1.71l7-7Z" />
             </svg>
-            Change setup
+            Home
           </Button>
         </div>
         <p className="mt-2 text-center text-sm text-base-400">
