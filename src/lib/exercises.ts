@@ -1,3 +1,6 @@
+import { shuffle } from './deck'
+import type { Settings } from './types'
+
 export interface Exercise {
   name: string
   /** Short coaching cue shown under the move. */
@@ -60,4 +63,16 @@ export function isPresetExercise(name: string): boolean {
 
 export function exerciseNote(name: string): string | undefined {
   return BY_NAME.get(name)?.note
+}
+
+export type MovePool = 'bodyweight' | 'all'
+
+/** Five different preset moves for the four suits plus the ace, for people who'd rather not choose. */
+export function randomMoves(pool: MovePool, rng: () => number = Math.random): Pick<Settings, 'moves' | 'aceMove'> {
+  const groups = pool === 'bodyweight' ? EXERCISE_GROUPS.filter((g) => g.label === 'Bodyweight') : EXERCISE_GROUPS
+  const [hearts, spades, clubs, diamonds, aceMove] = shuffle(
+    groups.flatMap((g) => g.exercises.map((e) => e.name)),
+    rng,
+  )
+  return { moves: { hearts, spades, clubs, diamonds }, aceMove }
 }
