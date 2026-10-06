@@ -1,6 +1,6 @@
-# 52-Card Workout
+# Burno
 
-Shuffle a deck, flip one card at a time, do the reps, no skipping. No cards or gym needed: the site deals a virtual deck, keeps time, and tracks every rep. Built for a quick 30–60 minute session with bodyweight or free weights, anywhere.
+*Flip. Burn. Repeat.* Shuffle a deck, flip one card at a time, do the reps, no skipping. No cards or gym needed: the site deals a virtual deck, keeps time, and tracks every rep. Built for a quick 30–60 minute session with bodyweight or free weights, anywhere.
 
 **🔗 Live:** https://leejyang00.github.io/52-card-workout/
 

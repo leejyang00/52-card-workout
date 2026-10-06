@@ -1,7 +1,7 @@
 /** Single place to rename the product once a brand/domain is chosen. */
 export const BRAND = {
-  name: '52-Card Workout',
-  tagline: 'Shuffle · Flip one card · Do the reps · No skipping',
+  name: 'Burno',
+  tagline: 'Flip. Burn. Repeat.',
   creator: 'Jian',
 }
 
