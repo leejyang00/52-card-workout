@@ -65,14 +65,28 @@ export function exerciseNote(name: string): string | undefined {
   return BY_NAME.get(name)?.note
 }
 
-export type MovePool = 'bodyweight' | 'all'
+export type MovePool = 'bodyweight' | 'mix' | 'gear'
+
+const names = (groups: ExerciseGroup[]) => groups.flatMap((g) => g.exercises.map((e) => e.name))
+const BODYWEIGHT = names(EXERCISE_GROUPS.filter((g) => g.label === 'Bodyweight'))
+const GEAR = names(EXERCISE_GROUPS.filter((g) => g.label !== 'Bodyweight'))
 
 /** Five different preset moves for the four suits plus the ace, for people who'd rather not choose. */
 export function randomMoves(pool: MovePool, rng: () => number = Math.random): Pick<Settings, 'moves' | 'aceMove'> {
-  const groups = pool === 'bodyweight' ? EXERCISE_GROUPS.filter((g) => g.label === 'Bodyweight') : EXERCISE_GROUPS
-  const [hearts, spades, clubs, diamonds, aceMove] = shuffle(
-    groups.flatMap((g) => g.exercises.map((e) => e.name)),
-    rng,
-  )
+  let picks: string[]
+  if (pool === 'mix') {
+    // At least two of each kind, so a mix never comes out all-bodyweight or all-gear.
+    const [bodyweight, gear] = [shuffle(BODYWEIGHT, rng), shuffle(GEAR, rng)]
+    const fifth = shuffle([...bodyweight.slice(2), ...gear.slice(2)], rng)[0]
+    picks = shuffle([...bodyweight.slice(0, 2), ...gear.slice(0, 2), fifth], rng)
+  } else {
+    picks = shuffle(pool === 'gear' ? GEAR : BODYWEIGHT, rng)
+  }
+  const [hearts, spades, clubs, diamonds, aceMove] = picks
   return { moves: { hearts, spades, clubs, diamonds }, aceMove }
+}
+
+/** Reads a stored pool, mapping the old two-way "Any gear" ('all') onto Mix. */
+export function toMovePool(value: unknown): MovePool {
+  return value === 'mix' || value === 'gear' || value === 'bodyweight' ? value : value === 'all' ? 'mix' : 'bodyweight'
 }
