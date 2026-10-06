@@ -1,6 +1,7 @@
 import { BRAND } from './brand'
 import type { MoveTotal } from './deck'
 import { formatDuration } from './format'
+import { FLAME_INNER, FLAME_OUTER, MARK_HEIGHT, MARK_WIDTH } from './logo'
 import { cssColor } from './palette'
 
 export interface ShareStats {
@@ -31,13 +32,34 @@ function colors() {
     onAccent: cssColor('on-accent'),
     stripe: cssColor('cardback'),
     stripe2: cssColor('cardback-2'),
+    flame: cssColor('flame'),
+    flame2: cssColor('flame-2'),
   }
 }
 const FONT = 'system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif'
-// U+FE0E asks for the text glyph so iOS doesn't swap suits for emoji. Hearts and diamonds are red.
-const SUITS = ['♥︎', '♠︎', '♦︎', '♣︎']
+const DISPLAY_FONT = `"Archivo Variable", ${FONT}`
 
 type Ctx = CanvasRenderingContext2D
+
+/** The logo card at (x, y), `scale` times its 80×100 size. */
+function drawMark(ctx: Ctx, x: number, y: number, scale: number, tip: string, base: string) {
+  ctx.save()
+  ctx.translate(x, y)
+  ctx.scale(scale, scale)
+  ctx.fillStyle = '#fff'
+  ctx.beginPath()
+  ctx.roundRect(3, 3, MARK_WIDTH - 6, MARK_HEIGHT - 6, 12)
+  ctx.fill()
+  const grad = ctx.createLinearGradient(0, 80, 0, 18)
+  grad.addColorStop(0, base)
+  grad.addColorStop(1, tip)
+  ctx.fillStyle = grad
+  ctx.fill(new Path2D(FLAME_OUTER))
+  ctx.globalAlpha = 0.55
+  ctx.fillStyle = tip
+  ctx.fill(new Path2D(FLAME_INNER))
+  ctx.restore()
+}
 
 function font(ctx: Ctx, weight: number, size: number, tracking = 0) {
   ctx.font = `${weight} ${size}px ${FONT}`
@@ -87,16 +109,13 @@ export function drawShareCard(ctx: Ctx, s: ShareStats) {
   ctx.textAlign = 'left'
 
   // Brand + date
-  font(ctx, 400, 56)
-  let x = PAD
-  for (const [i, glyph] of SUITS.entries()) {
-    ctx.fillStyle = i % 2 === 0 ? C.red : C.text
-    ctx.fillText(glyph, x, 170)
-    x += 72
-  }
-  font(ctx, 900, 60, -1)
+  drawMark(ctx, PAD, 110, 1.3, C.flame, C.flame2)
+  ctx.font = `900 112px ${DISPLAY_FONT}`
+  if ('fontStretch' in ctx) ctx.fontStretch = 'expanded'
+  if ('letterSpacing' in ctx) ctx.letterSpacing = '-2px'
   ctx.fillStyle = C.text
-  ctx.fillText(BRAND.name, PAD, 260)
+  ctx.fillText(BRAND.name.toUpperCase(), PAD + 136, 232)
+  if ('fontStretch' in ctx) ctx.fontStretch = 'normal'
   font(ctx, 500, 36)
   ctx.fillStyle = C.muted
   ctx.fillText(
@@ -181,6 +200,8 @@ export async function renderShareCard(stats: ShareStats): Promise<Blob> {
   const canvas = document.createElement('canvas')
   canvas.width = SHARE_WIDTH
   canvas.height = SHARE_HEIGHT
+  // Canvas won't wait for a webfont, so make sure the wordmark face is ready first.
+  await document.fonts.load(`900 112px ${DISPLAY_FONT}`).catch(() => {})
   drawShareCard(canvas.getContext('2d')!, stats)
   return new Promise((resolve, reject) =>
     canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('Could not render image'))), 'image/png'),

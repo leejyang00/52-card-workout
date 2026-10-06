@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { BrandHero } from '../components/BrandHero'
 import { Button } from '../components/Button'
 import { ExerciseSelect } from '../components/ExerciseSelect'
 import { IntroSheet } from '../components/IntroSheet'
@@ -6,7 +7,6 @@ import { Segmented } from '../components/Segmented'
 import { SuitBadge } from '../components/SuitBadge'
 import { Toggle } from '../components/Toggle'
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { BRAND } from '../lib/brand'
 import { ACE_REPS, SUIT_LABEL, SUITS } from '../lib/deck'
 import { randomMoves, toMovePool, type MovePool } from '../lib/exercises'
 import { DEFAULT_SETTINGS, TIMER_PRESETS } from '../lib/settings'
@@ -52,15 +52,11 @@ export function SetupScreen({ settings, onChange, onStart }: Props) {
   return (
     <div className="mx-auto flex min-h-dvh max-w-xl flex-col px-4 pt-8 pb-32 sm:pt-12">
       <header className="mb-6 text-center">
-        <p className="mb-2 text-3xl tracking-widest" aria-hidden>
-          <span className="text-suit-red">♥</span> ♠ <span className="text-suit-red">♦</span> ♣
-        </p>
-        <h1 className="text-4xl font-black tracking-tight sm:text-5xl">{BRAND.name}</h1>
-        <p className="mt-2 text-base-400">{BRAND.tagline}</p>
+        <BrandHero />
         <button
           type="button"
           onClick={() => setIntroOpen(true)}
-          className="mt-4 inline-flex h-9 items-center gap-2 rounded-full bg-base-800 px-4 text-sm font-semibold text-base-200 hover:bg-base-700 focus-visible:outline-2 focus-visible:outline-accent"
+          className="mt-5 inline-flex h-9 items-center gap-2 rounded-full bg-base-800 px-4 text-sm font-semibold text-base-200 hover:bg-base-700 focus-visible:outline-2 focus-visible:outline-accent"
         >
           <span aria-hidden className="grid size-5 place-items-center rounded-full bg-accent text-xs font-black text-on-accent">
             ?
