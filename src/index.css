@@ -1,0 +1,37 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+
+  /* Carried over from the original sheet: card red and the Ace-row yellow. */
+  --color-suit-red: #c0182b;
+  --color-accent: #f4c542;
+  --color-accent-strong: #e0ad1f;
+
+  --animate-flip-in: flip-in 320ms cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  @keyframes flip-in {
+    from {
+      transform: perspective(900px) rotateY(85deg) scale(0.96);
+      opacity: 0.3;
+    }
+    to {
+      transform: perspective(900px) rotateY(0) scale(1);
+      opacity: 1;
+    }
+  }
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply min-h-dvh bg-stone-950 text-stone-100 antialiased;
+  }
+  /* Tabular digits so the timer doesn't jitter as it ticks. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
