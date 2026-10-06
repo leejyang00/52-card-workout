@@ -4,6 +4,8 @@ export const BRAND = {
   tagline: 'Flip. Burn. Repeat.',
   creator: 'Jian',
   domain: 'burno.app',
+  creatorUrl: 'https://www.linkedin.com/in/jianyanglee/',
+  tipUrl: 'https://ko-fi.com/burnoo',
 }
 
 /** Absolute URL of the app, correct for GitHub Pages today and a custom domain later. */

@@ -2,12 +2,14 @@ import { useState } from 'react'
 import { BrandHero } from '../components/BrandHero'
 import { Button } from '../components/Button'
 import { ExerciseSelect } from '../components/ExerciseSelect'
+import { ExternalLink } from '../components/ExternalLink'
 import { IntroSheet } from '../components/IntroSheet'
 import { Segmented } from '../components/Segmented'
 import { SuitBadge } from '../components/SuitBadge'
 import { ThemeToggle } from '../components/ThemeToggle'
 import { Toggle } from '../components/Toggle'
 import { useLocalStorage } from '../hooks/useLocalStorage'
+import { BRAND } from '../lib/brand'
 import { ACE_REPS, SUIT_LABEL, SUITS } from '../lib/deck'
 import { randomMoves, toMovePool, type MovePool } from '../lib/exercises'
 import { DEFAULT_SETTINGS, TIMER_PRESETS } from '../lib/settings'
@@ -225,6 +227,11 @@ export function SetupScreen({ settings, onChange, onStart }: Props) {
             </li>
           </ul>
         </details>
+
+        <p className="text-center text-sm text-base-400">
+          Made by <ExternalLink href={BRAND.creatorUrl}>{BRAND.creator}</ExternalLink> ·{' '}
+          <ExternalLink href={BRAND.tipUrl}>Buy me a coffee ☕</ExternalLink>
+        </p>
       </div>
 
       <div className="fixed inset-x-0 bottom-0 bg-gradient-to-t from-base-950 via-base-950/95 to-transparent px-4 pt-6 pb-[max(1rem,env(safe-area-inset-bottom))]">
