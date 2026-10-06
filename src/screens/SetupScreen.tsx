@@ -8,6 +8,7 @@ import { Toggle } from '../components/Toggle'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import { BRAND } from '../lib/brand'
 import { ACE_REPS, SUIT_LABEL, SUITS } from '../lib/deck'
+import { randomMoves, type MovePool } from '../lib/exercises'
 import { DEFAULT_SETTINGS, TIMER_PRESETS } from '../lib/settings'
 import type { Settings } from '../lib/types'
 
@@ -32,6 +33,13 @@ export function SetupScreen({ settings, onChange, onStart }: Props) {
   const closeIntro = () => {
     setIntroOpen(false)
     setIntroSeen(true)
+  }
+  const [pool, setPool] = useLocalStorage<MovePool>('cw:shuffle-pool:v1', 'bodyweight')
+  // Bumped on every shuffle so each ExerciseSelect remounts and drops any open "Custom…" input.
+  const [shuffles, setShuffles] = useState(0)
+  const shuffleMoves = () => {
+    onChange({ ...settings, ...randomMoves(pool) })
+    setShuffles((n) => n + 1)
   }
   const set = <K extends keyof Settings>(key: K, value: Settings[K]) => onChange({ ...settings, [key]: value })
   const allNamed = SUITS.every((s) => settings.moves[s].trim()) && settings.aceMove.trim()
@@ -63,11 +71,34 @@ export function SetupScreen({ settings, onChange, onStart }: Props) {
 
       <div className="flex flex-col gap-4">
         <Section title="Suit = the move">
+          <div className="mb-4 flex flex-col gap-2 border-b border-stone-800 pb-4">
+            <div className="flex gap-2">
+              <Button variant="secondary" className="h-12 shrink-0" onClick={shuffleMoves}>
+                <svg aria-hidden viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.75" className="size-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h2.5c1.6 0 3 .8 3.9 2.1l2.2 3.8A4.5 4.5 0 0 0 15.5 14H17m0 0-2-2m2 2-2 2M3 14h2.5c1 0 2-.3 2.7-.9M17 6h-1.5c-1 0-2 .3-2.7.9M17 6l-2-2m2 2-2 2" />
+                </svg>
+                Shuffle moves
+              </Button>
+              <div className="min-w-0 flex-1">
+                <Segmented
+                  label="Moves to shuffle from"
+                  value={pool}
+                  onChange={setPool}
+                  options={[
+                    { value: 'bodyweight', label: 'No gear' },
+                    { value: 'all', label: 'Any gear' },
+                  ]}
+                />
+              </div>
+            </div>
+            <p className="text-sm text-stone-400">Can't decide? Get five random moves. Tap again for a new mix.</p>
+          </div>
           <ul className="flex flex-col gap-3">
             {SUITS.map((suit) => (
               <li key={suit} className="flex items-start gap-3">
                 <SuitBadge suit={suit} label={SUIT_LABEL[suit]} />
                 <ExerciseSelect
+                  key={shuffles}
                   label={`${SUIT_LABEL[suit]} exercise`}
                   value={settings.moves[suit]}
                   onChange={(name) => set('moves', { ...settings.moves, [suit]: name })}
@@ -78,6 +109,7 @@ export function SetupScreen({ settings, onChange, onStart }: Props) {
               <SuitBadge suit="ace" label="Any ace" />
               <div className="flex min-w-0 flex-1 flex-col gap-1">
                 <ExerciseSelect
+                  key={shuffles}
                   label="Ace exercise"
                   value={settings.aceMove}
                   onChange={(name) => set('aceMove', name)}
