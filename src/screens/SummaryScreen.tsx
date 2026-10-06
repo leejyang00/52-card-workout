@@ -1,22 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Button } from '../components/Button'
 import { ExternalLink } from '../components/ExternalLink'
 import { FeedbackSheet, Stars } from '../components/FeedbackSheet'
 import { MoveTotals } from '../components/MoveTotals'
 import { ShareSheet } from '../components/ShareSheet'
-import { useLocalStorage } from '../hooks/useLocalStorage'
 import { BRAND } from '../lib/brand'
 import { moveTotals } from '../lib/deck'
-import {
-  feedbackEnabled,
-  INITIAL_PROMPT_STATE,
-  recordFinish,
-  shouldPrompt,
-  snooze,
-  SNOOZE_AFTER_DISMISS,
-  SNOOZE_AFTER_SEND,
-  type PromptState,
-} from '../lib/feedback'
+import { feedbackEnabled } from '../lib/feedback'
 import { formatDuration } from '../lib/format'
 import type { Session } from '../hooks/useSession'
 
@@ -35,12 +25,7 @@ export function SummaryScreen({ session, onRestart, onDone }: Props) {
   const countdownMs = settings.timerMinutes * 60_000
   const beatClock = settings.timerMode === 'down' && cleared && clock.accumulatedMs <= countdownMs
 
-  const [prompt, setPrompt] = useLocalStorage<PromptState>('cw:feedback-prompt:v1', INITIAL_PROMPT_STATE)
-  useEffect(() => {
-    if (finishedAt) setPrompt((p) => recordFinish(p, finishedAt))
-  }, [finishedAt, setPrompt])
-  // Decided once per summary so the card doesn't vanish mid-sheet when sending snoozes it.
-  const [askForRating] = useState(() => feedbackEnabled && shouldPrompt(recordFinish(prompt, finishedAt ?? 0), Date.now()))
+  // Asked after every workout, finished or not; closing the card only hides it for this summary.
   const [cardState, setCardState] = useState<'ask' | 'dismissed' | 'thanked'>('ask')
   const [feedbackRating, setFeedbackRating] = useState(0)
   const [feedbackOpen, setFeedbackOpen] = useState(false)
@@ -48,14 +33,8 @@ export function SummaryScreen({ session, onRestart, onDone }: Props) {
     setFeedbackRating(rating)
     setFeedbackOpen(true)
   }
-  const dismissCard = () => {
-    setCardState('dismissed')
-    setPrompt((p) => snooze(p, Date.now(), SNOOZE_AFTER_DISMISS))
-  }
-  const onFeedbackSent = () => {
-    setCardState('thanked')
-    setPrompt((p) => snooze(p, Date.now(), SNOOZE_AFTER_SEND))
-  }
+  const dismissCard = () => setCardState('dismissed')
+  const onFeedbackSent = () => setCardState('thanked')
 
   const stats = [
     ['Time', formatDuration(clock.accumulatedMs)],
@@ -93,7 +72,7 @@ export function SummaryScreen({ session, onRestart, onDone }: Props) {
         <MoveTotals totals={totals} />
       </section>
 
-      {askForRating && cardState !== 'dismissed' && (
+      {feedbackEnabled && cardState !== 'dismissed' && (
         <section className="relative mt-4 flex flex-col items-center rounded-2xl bg-base-900/60 p-4 text-center ring-1 ring-base-800">
           {cardState === 'thanked' ? (
             <p className="py-2 text-sm font-semibold text-base-300">Thanks for the feedback! 🙏</p>
@@ -124,12 +103,20 @@ export function SummaryScreen({ session, onRestart, onDone }: Props) {
           </svg>
           Share workout
         </Button>
-        <Button size="lg" onClick={onRestart}>
-          Same moves, new shuffle
-        </Button>
-        <Button variant="ghost" size="lg" onClick={onDone}>
-          Change setup
-        </Button>
+        <div className="grid grid-cols-2 gap-2">
+          <Button className="whitespace-nowrap" onClick={onRestart} aria-label="Same moves, new shuffle">
+            <svg viewBox="0 0 20 20" fill="currentColor" className="size-5 shrink-0" aria-hidden>
+              <path d="M15.31 3.72a.75.75 0 0 1 1.06 0l2 2a.75.75 0 0 1 0 1.06l-2 2a.75.75 0 1 1-1.06-1.06l.72-.72H14.5a2.75 2.75 0 0 0-2.2 1.1l-4.1 5.47A4.25 4.25 0 0 1 4.8 15.25H2.75a.75.75 0 0 1 0-1.5H4.8a2.75 2.75 0 0 0 2.2-1.1l4.1-5.47a4.25 4.25 0 0 1 3.4-1.7h1.53l-.72-.72a.75.75 0 0 1 0-1.04ZM2 5.5a.75.75 0 0 1 .75-.75H4.8c1.24 0 2.4.54 3.2 1.46a.75.75 0 1 1-1.13.98A2.75 2.75 0 0 0 4.8 6.25H2.75A.75.75 0 0 1 2 5.5Zm10.13 7.33a.75.75 0 0 1 1.06.07 2.75 2.75 0 0 0 1.31.85h1.53l-.72-.72a.75.75 0 1 1 1.06-1.06l2 2a.75.75 0 0 1 0 1.06l-2 2a.75.75 0 1 1-1.06-1.06l.72-.72H14.5a4.25 4.25 0 0 1-2.44-.77.75.75 0 0 1 .07-1.65Z" />
+            </svg>
+            New shuffle
+          </Button>
+          <Button className="whitespace-nowrap" onClick={onDone}>
+            <svg viewBox="0 0 20 20" fill="currentColor" className="size-5 shrink-0" aria-hidden>
+              <path d="M10 3.75a.75.75 0 0 1 .75.75v.38a2.25 2.25 0 0 1 0 4.24v6.38a.75.75 0 0 1-1.5 0V9.12a2.25 2.25 0 0 1 0-4.24V4.5a.75.75 0 0 1 .75-.75Zm-5 0a.75.75 0 0 1 .75.75v5.63a2.25 2.25 0 0 1 0 4.24v1.13a.75.75 0 0 1-1.5 0v-1.13a2.25 2.25 0 0 1 0-4.24V4.5A.75.75 0 0 1 5 3.75Zm10 0a.75.75 0 0 1 .75.75v1.63a2.25 2.25 0 0 1 0 4.24v5.13a.75.75 0 0 1-1.5 0v-5.13a2.25 2.25 0 0 1 0-4.24V4.5a.75.75 0 0 1 .75-.75Z" />
+            </svg>
+            Change setup
+          </Button>
+        </div>
         <p className="mt-2 text-center text-sm text-base-400">
           Enjoying {BRAND.name}? <ExternalLink href={BRAND.tipUrl}>Buy me a coffee ☕</ExternalLink>
         </p>

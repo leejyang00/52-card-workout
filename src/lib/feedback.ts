@@ -91,34 +91,3 @@ export async function sendFeedback(payload: FeedbackPayload): Promise<void> {
     body: JSON.stringify(payload),
   })
 }
-
-/** When to show the rating card after a workout. Kept in localStorage. */
-export interface PromptState {
-  /** Workouts finished on this device. */
-  finished: number
-  /** finishedAt of the last counted workout, so a reload or remount doesn't count it twice. */
-  lastFinishedAt: number | null
-  /** Don't ask again before this time (ms). */
-  snoozedUntil: number
-}
-
-export const INITIAL_PROMPT_STATE: PromptState = { finished: 0, lastFinishedAt: null, snoozedUntil: 0 }
-
-/** First-timers just get their summary: ask from the second finished workout on. */
-export const PROMPT_AFTER_WORKOUTS = 2
-const DAY = 86_400_000
-export const SNOOZE_AFTER_DISMISS = 30 * DAY
-export const SNOOZE_AFTER_SEND = 90 * DAY
-
-export function recordFinish(state: PromptState, finishedAt: number): PromptState {
-  if (state.lastFinishedAt === finishedAt) return state
-  return { ...state, finished: state.finished + 1, lastFinishedAt: finishedAt }
-}
-
-export function shouldPrompt(state: PromptState, now: number): boolean {
-  return state.finished >= PROMPT_AFTER_WORKOUTS && now >= state.snoozedUntil
-}
-
-export function snooze(state: PromptState, now: number, ms: number): PromptState {
-  return { ...state, snoozedUntil: now + ms }
-}
