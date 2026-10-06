@@ -1,5 +1,6 @@
 import { BRAND } from '../lib/brand'
 import { Button } from './Button'
+import { ExternalLink } from './ExternalLink'
 import { Sheet } from './Sheet'
 
 const STEPS = [
@@ -69,7 +70,12 @@ export function IntroSheet({ open, onClose }: { open: boolean; onClose: () => vo
           </span>
           <span>
             <span className="block text-sm font-bold">From the creator</span>
-            <span className="block text-xs text-base-400">{BRAND.creator}</span>
+            <span className="block text-xs text-base-400">
+              {BRAND.creator} ·{' '}
+              <ExternalLink href={BRAND.creatorUrl} className="font-normal">
+                LinkedIn
+              </ExternalLink>
+            </span>
           </span>
         </figcaption>
         <blockquote className="flex flex-col gap-2 text-sm text-base-300">
@@ -82,6 +88,10 @@ export function IntroSheet({ open, onClose }: { open: boolean; onClose: () => vo
             intense workout. Hope it fits into your day the way it fits into mine.
           </p>
         </blockquote>
+        <p className="mt-3 text-sm text-base-400">
+          {BRAND.name} is free, no ads. If it gets you sweating,{' '}
+          <ExternalLink href={BRAND.tipUrl}>buy me a coffee ☕</ExternalLink>
+        </p>
       </figure>
     </Sheet>
   )

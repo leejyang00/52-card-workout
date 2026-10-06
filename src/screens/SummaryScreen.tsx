@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { Button } from '../components/Button'
+import { ExternalLink } from '../components/ExternalLink'
 import { MoveTotals } from '../components/MoveTotals'
 import { ShareSheet } from '../components/ShareSheet'
+import { BRAND } from '../lib/brand'
 import { moveTotals } from '../lib/deck'
 import { formatDuration } from '../lib/format'
 import type { Session } from '../hooks/useSession'
@@ -70,6 +72,9 @@ export function SummaryScreen({ session, onRestart, onDone }: Props) {
         <Button variant="ghost" size="lg" onClick={onDone}>
           Change setup
         </Button>
+        <p className="mt-2 text-center text-sm text-base-400">
+          Enjoying {BRAND.name}? <ExternalLink href={BRAND.tipUrl}>Buy me a coffee ☕</ExternalLink>
+        </p>
       </div>
 
       <ShareSheet
