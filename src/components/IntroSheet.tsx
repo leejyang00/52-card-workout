@@ -58,6 +58,31 @@ export function IntroSheet({ open, onClose }: { open: boolean; onClose: () => vo
           </li>
         ))}
       </ul>
+
+      <figure className="mt-6 rounded-2xl border-l-4 border-accent bg-stone-800/30 p-4">
+        <figcaption className="mb-2 flex items-center gap-3">
+          <span
+            aria-hidden
+            className="grid size-9 place-items-center rounded-full bg-accent text-sm font-black text-stone-950"
+          >
+            {BRAND.creator[0]}
+          </span>
+          <span>
+            <span className="block text-sm font-bold">From the creator</span>
+            <span className="block text-xs text-stone-400">{BRAND.creator}</span>
+          </span>
+        </figcaption>
+        <blockquote className="flex flex-col gap-2 text-sm text-stone-300">
+          <p>
+            My schedule kept beating my gym plans. Some days there just isn't time to get to a gym, but there's always
+            a bit of floor, and usually a pull-up bar somewhere nearby.
+          </p>
+          <p>
+            That's all this needs. Shuffle, flip, and you've started a workout wherever you are. A simple idea, but an
+            intense workout. Hope it fits into your day the way it fits into mine.
+          </p>
+        </blockquote>
+      </figure>
     </Sheet>
   )
 }

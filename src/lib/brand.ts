@@ -2,6 +2,7 @@
 export const BRAND = {
   name: '52-Card Workout',
   tagline: 'Shuffle · Flip one card · Do the reps · No skipping',
+  creator: 'Jian',
 }
 
 /** Absolute URL of the app, correct for GitHub Pages today and a custom domain later. */
