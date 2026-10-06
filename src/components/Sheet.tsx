@@ -9,7 +9,11 @@ interface Props {
   footer?: ReactNode
 }
 
-/** Native <dialog>: bottom sheet on phones, centred modal from `sm` up. Esc and backdrop tap close it. */
+/**
+ * Native <dialog>: bottom sheet on phones, centred modal from `sm` up. Esc and backdrop tap close it.
+ * The dialog itself is the only scroll container, with a sticky header and footer. Older iOS Safari
+ * collapses a nested flex scroll area to nothing, so don't reintroduce one.
+ */
 export function Sheet({ open, onClose, title, children, footer }: Props) {
   const ref = useRef<HTMLDialogElement>(null)
   const titleId = useId()
@@ -25,6 +29,17 @@ export function Sheet({ open, onClose, title, children, footer }: Props) {
     if (!open && dialog.open) dialog.close()
   }, [open])
 
+  // Stop the page behind from scrolling (and stealing touch scrolls) while the sheet is up.
+  useEffect(() => {
+    if (!open) return
+    const root = document.documentElement
+    const previous = root.style.overflow
+    root.style.overflow = 'hidden'
+    return () => {
+      root.style.overflow = previous
+    }
+  }, [open])
+
   return (
     <dialog
       ref={ref}
@@ -33,9 +48,9 @@ export function Sheet({ open, onClose, title, children, footer }: Props) {
       onClose={onClose}
       // A click whose target is the <dialog> itself landed on the backdrop.
       onClick={(e) => e.target === ref.current && onClose()}
-      className="mx-auto mt-auto mb-0 max-h-[92dvh] w-full max-w-none overflow-hidden rounded-t-3xl bg-stone-900 p-0 text-stone-100 ring-1 ring-stone-800 outline-none backdrop:bg-black/70 backdrop:backdrop-blur-sm open:flex open:flex-col sm:my-auto sm:max-w-lg sm:rounded-3xl motion-safe:open:animate-sheet-in"
+      className="mx-auto mt-auto mb-0 max-h-[92vh] supports-[height:100dvh]:max-h-[92dvh] w-full max-w-none overflow-y-auto overscroll-contain rounded-t-3xl bg-stone-900 p-0 text-stone-100 ring-1 ring-stone-800 outline-none backdrop:bg-black/70 backdrop:backdrop-blur-sm sm:my-auto sm:max-w-lg sm:rounded-3xl motion-safe:open:animate-sheet-in"
     >
-      <header className="flex items-center justify-between gap-4 px-5 pt-5 pb-2">
+      <header className="sticky top-0 z-10 flex items-center justify-between gap-4 bg-stone-900 px-5 pt-5 pb-2">
         <h2 id={titleId} className="text-xl font-black">
           {title}
         </h2>
@@ -50,9 +65,11 @@ export function Sheet({ open, onClose, title, children, footer }: Props) {
           </svg>
         </button>
       </header>
-      <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-5">{children}</div>
+      <div className="px-5 pb-5">{children}</div>
       {footer && (
-        <div className="border-t border-stone-800 px-5 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]">{footer}</div>
+        <div className="sticky bottom-0 z-10 border-t border-stone-800 bg-stone-900 px-5 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
+          {footer}
+        </div>
       )}
     </dialog>
   )
