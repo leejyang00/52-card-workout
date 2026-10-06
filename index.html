@@ -3,17 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#0a0f1a" />
-    <script>
-      // Apply the colour palette before first paint. See src/lib/palette.ts.
-      try {
-        var p = new URLSearchParams(location.search).get('palette')
-        if (p === 'default') localStorage.removeItem('cw:palette')
-        else if (p) localStorage.setItem('cw:palette', p)
-        p = localStorage.getItem('cw:palette')
-        if (p) document.documentElement.dataset.palette = p
-      } catch (e) {}
-    </script>
+    <meta name="theme-color" content="#fff3ea" />
     <meta name="description" content="Shuffle a virtual deck, flip a card, do the reps. A no-equipment-needed workout you can run anywhere." />
     <link rel="icon" type="image/svg+xml" href="%BASE_URL%favicon.svg" />
     <meta property="og:type" content="website" />

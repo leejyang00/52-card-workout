@@ -48,9 +48,13 @@ function drawMark(ctx: Ctx, x: number, y: number, scale: number, tip: string, ba
   ctx.translate(x, y)
   ctx.scale(scale, scale)
   ctx.fillStyle = '#fff'
+  ctx.shadowColor = 'rgb(0 0 0 / 0.14)'
+  ctx.shadowBlur = 14
+  ctx.shadowOffsetY = 4
   ctx.beginPath()
   ctx.roundRect(3, 3, MARK_WIDTH - 6, MARK_HEIGHT - 6, 12)
   ctx.fill()
+  ctx.shadowColor = 'transparent'
   const grad = ctx.createLinearGradient(0, 87, 0, 12)
   grad.addColorStop(0, base)
   grad.addColorStop(1, tip)
