@@ -1,43 +1,48 @@
 # 52-Card Workout
 
-A single-page, print-friendly deck-of-cards workout. Shuffle a standard 52-card deck, flip one card at a time, and do the reps — no skipping.
+Shuffle a deck, flip one card at a time, do the reps, no skipping. No cards or gym needed: the site deals a virtual deck, keeps time, and tracks every rep. Built for a quick 30–60 minute session with bodyweight or free weights, anywhere.
 
-**🔗 Live page:** https://leejyang00.github.io/52-card-workout/
-
-Open it on your phone or any browser. It's designed to fit a single A4 page, so you can also print it out.
+**🔗 Live:** https://leejyang00.github.io/52-card-workout/
 
 ## How it works
 
 **Suit = the move · Number = the reps**
 
-| Suit | Move |
-| --- | --- |
-| ♥ Hearts | Push-ups |
-| ♠ Spades | Clean & Press (squat-to-press) |
-| ♣ Clubs | Burpees |
-| ♦ Diamonds | Sit-ups |
+- **2–10** face value · **J** 11 · **Q** 12 · **K** 13 (optionally capped at 10)
+- **Any Ace** = 20 reps of the wildcard move (default: lunges)
+- **Jokers** (optional) = 1-minute rest, or 30 sec of your hardest move
 
-**Reps by card:**
+Classic moves: ♥ Push-ups · ♠ Clean & Press · ♣ Burpees · ♦ Sit-ups. Every suit and the Ace can be swapped from a list of bodyweight, bar and dumbbell/kettlebell moves, or set to any custom move.
 
-- **2–10** — face value
-- **J** = 11 · **Q** = 12 · **K** = 13
-- **Any Ace** = 20 lunges (10 per leg) — wildcard, overrides the suit
+## Features
 
-## House rules
+- **Virtual deck:** shuffled 52 (or half-deck 26) with optional jokers, flip and undo, cards-left counter, and the flipped pile
+- **Timer:** count up, or count down from 30/45/60 min. Starts on the first flip; pause/resume; vibrates when the countdown ends
+- **Rep tracking:** done vs. total for each move, plus a summary at the end
+- **Survives reloads:** settings and the workout in progress are saved in the browser (localStorage). No backend, no accounts
+- **Keeps the screen awake** while the timer runs (where supported)
 
-- **Jokers** — 1-minute rest, or 30 sec of your hardest move (dealer's choice).
-- **No stopping** until you flip a face card — that's your earned breather.
-- **Diamonds variant** — swap counted sit-ups for a 45-sec plank hold for a nastier core burn.
-- **Too tough?** Run half the deck, or cap all face cards at 10 reps.
-- **Too easy?** Two decks, or bump face cards higher.
+## Develop
 
-## Full-deck total
+```sh
+npm install
+npm run dev      # http://localhost:5173/52-card-workout/
+npm test         # deck/reps logic (Vitest)
+npm run build    # type-check + production build to dist/
+```
 
-Roughly **90** each of push-ups / presses / burpees / sit-ups + **80** lunges — about **30–45 minutes**.
+Stack: Vite, React, TypeScript, Tailwind CSS v4.
 
-## Repo contents
+```
+src/
+  lib/         pure logic: deck, reps, exercise catalog, defaults
+  hooks/       session state, localStorage, clock, wake lock
+  components/  reusable UI (card, timer, selects, toggles…)
+  screens/     Setup → Workout → Summary
+```
 
-- `52-card-workout.html` — the original page
-- `index.html` — identical copy served at the site root (the shareable link above)
+## Deploy
 
-Hosted free via GitHub Pages. Edit the HTML, commit, and push to `main` — the live site updates within a minute or two.
+Pushing to `main` runs `.github/workflows/deploy.yml`, which tests, builds and publishes `dist/` to GitHub Pages. In repo **Settings → Pages**, the source must be **GitHub Actions**.
+
+`public/52-card-workout.pdf` is the original printable one-page sheet.
