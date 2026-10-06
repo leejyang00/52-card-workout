@@ -3,7 +3,7 @@
  * is picked by setting `data-palette` on <html>. The inline script in index.html applies it before
  * first paint: `?palette=<name>` sets it (and remembers it), `?palette=default` clears it.
  */
-export const PALETTES = ['volt', 'afterburn', 'electric', 'chalk'] as const
+export const PALETTES = ['volt', 'afterburn', 'electric', 'sky', 'sunrise', 'berry', 'mint'] as const
 export type Palette = (typeof PALETTES)[number]
 
 /** Read a palette colour as the page currently resolves it, e.g. `cssColor('accent')`. */

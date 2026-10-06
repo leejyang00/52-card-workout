@@ -34,6 +34,7 @@ function colors() {
     stripe2: cssColor('cardback-2'),
     flame: cssColor('flame'),
     flame2: cssColor('flame-2'),
+    flameCore: cssColor('flame-core'),
   }
 }
 const FONT = 'system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif'
@@ -42,7 +43,7 @@ const DISPLAY_FONT = `"Archivo Variable", ${FONT}`
 type Ctx = CanvasRenderingContext2D
 
 /** The logo card at (x, y), `scale` times its 80×100 size. */
-function drawMark(ctx: Ctx, x: number, y: number, scale: number, tip: string, base: string) {
+function drawMark(ctx: Ctx, x: number, y: number, scale: number, tip: string, base: string, core: string) {
   ctx.save()
   ctx.translate(x, y)
   ctx.scale(scale, scale)
@@ -50,13 +51,12 @@ function drawMark(ctx: Ctx, x: number, y: number, scale: number, tip: string, ba
   ctx.beginPath()
   ctx.roundRect(3, 3, MARK_WIDTH - 6, MARK_HEIGHT - 6, 12)
   ctx.fill()
-  const grad = ctx.createLinearGradient(0, 80, 0, 18)
+  const grad = ctx.createLinearGradient(0, 87, 0, 12)
   grad.addColorStop(0, base)
   grad.addColorStop(1, tip)
   ctx.fillStyle = grad
   ctx.fill(new Path2D(FLAME_OUTER))
-  ctx.globalAlpha = 0.55
-  ctx.fillStyle = tip
+  ctx.fillStyle = core
   ctx.fill(new Path2D(FLAME_INNER))
   ctx.restore()
 }
@@ -109,7 +109,7 @@ export function drawShareCard(ctx: Ctx, s: ShareStats) {
   ctx.textAlign = 'left'
 
   // Brand + date
-  drawMark(ctx, PAD, 110, 1.3, C.flame, C.flame2)
+  drawMark(ctx, PAD, 110, 1.3, C.flame, C.flame2, C.flameCore)
   ctx.font = `900 112px ${DISPLAY_FONT}`
   if ('fontStretch' in ctx) ctx.fontStretch = 'expanded'
   if ('letterSpacing' in ctx) ctx.letterSpacing = '-2px'

@@ -13,9 +13,9 @@ export function BurnoMark({ className = '' }: { className?: string }) {
         </linearGradient>
       </defs>
       <rect x="3" y="3" width="74" height="94" rx="12" fill="#fff" />
-      <g className="origin-[40px_80px] motion-safe:animate-flicker">
+      <g className="origin-[40px_86px] motion-safe:animate-flicker">
         <path d={FLAME_OUTER} fill={`url(#${id}-flame)`} />
-        <path d={FLAME_INNER} fill="var(--color-flame)" opacity="0.55" />
+        <path d={FLAME_INNER} fill="var(--color-flame-core)" />
       </g>
     </svg>
   )

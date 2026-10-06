@@ -24,7 +24,7 @@ export function Segmented<T extends string | number>({ label, options, value, on
             aria-checked={selected}
             onClick={() => onChange(o.value)}
             className={`h-10 flex-1 rounded-lg text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-accent ${
-              selected ? 'bg-base-100 text-base-950' : 'text-base-400 hover:text-base-100'
+              selected ? 'bg-select text-on-select' : 'text-base-400 hover:text-base-100'
             }`}
           >
             {o.label}

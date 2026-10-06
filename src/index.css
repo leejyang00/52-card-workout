@@ -10,8 +10,8 @@
    * Palette tokens. These defaults are the Volt palette; the others live in the [data-palette]
    * blocks below and are picked in src/lib/palette.ts. `base-*` is the neutral scale (950 = page,
    * 100 = text), so a light palette just flips it. Text on white cards uses `card-ink`, text on the
-   * accent uses `on-accent`, so neither flips with it. `flame` (tip) and `flame-2` (base) colour
-   * the logo.
+   * accent uses `on-accent`, so neither flips with it. `flame` (tip), `flame-2` (base) and
+   * `flame-core` colour the logo.
    */
   --color-base-950: #0a0f1a;
   --color-base-900: #121a2b;
@@ -28,6 +28,10 @@
   --color-pop: #38bdf8;
   --color-flame: #c6f432;
   --color-flame-2: #38bdf8;
+  --color-flame-core: #eaff9a;
+  /* Selected pill in segmented controls. */
+  --color-select: var(--color-base-100);
+  --color-on-select: var(--color-base-950);
   --color-suit-red: #e11d48;
   --color-card-ink: #111827;
   --color-cardback: #c6f432;
@@ -99,6 +103,7 @@
   --color-pop: #ff5a36;
   --color-flame: #ffc83d;
   --color-flame-2: #ff4d2e;
+  --color-flame-core: #ffe58a;
 }
 
 [data-palette='electric'] {
@@ -117,28 +122,108 @@
   --color-pop: #ff5a36;
   --color-flame: #ffb23d;
   --color-flame-2: #ff3d5a;
+  --color-flame-core: #ffe08a;
   --color-cardback: #3d7bff;
   --color-cardback-2: #2a5fe0;
 }
 
-/* Light: ink buttons with lime type, like chalk on a gym floor. */
-[data-palette='chalk'] {
+/*
+ * Light palettes. Each tints the whole neutral scale toward its accent, so the page, inputs and
+ * dividers sit in between white and ink instead of being one or the other.
+ */
+[data-palette='sky'] {
   color-scheme: light;
-  --color-base-950: #f3f4f0;
+  --color-base-950: #eaf1ff;
   --color-base-900: #ffffff;
-  --color-base-800: #e4e6df;
-  --color-base-700: #cdd0c6;
-  --color-base-500: #8b8f84;
-  --color-base-400: #5b5f56;
-  --color-base-300: #3a3d36;
-  --color-base-200: #24261f;
-  --color-base-100: #12140f;
-  --color-accent: #12140f;
-  --color-accent-strong: #2b2e26;
-  --color-on-accent: #c6f432;
-  --color-pop: #65a30d;
-  --color-flame: #ffb23d;
+  --color-base-800: #d6e3ff;
+  --color-base-700: #b9cdf7;
+  --color-base-500: #7a8cb5;
+  --color-base-400: #4d5f8a;
+  --color-base-300: #2e3d63;
+  --color-base-200: #1d2948;
+  --color-base-100: #111a33;
+  --color-accent: #2f5bff;
+  --color-accent-strong: #1f48e6;
+  --color-on-accent: #ffffff;
+  --color-pop: #ff6a2b;
+  --color-flame: #ffc23d;
   --color-flame-2: #ff4d2e;
-  --color-cardback: #12140f;
-  --color-cardback-2: #2b2e26;
+  --color-flame-core: #ffe58a;
+  --color-cardback: #2f5bff;
+  --color-cardback-2: #1f48e6;
+  --color-select: var(--color-accent);
+  --color-on-select: var(--color-on-accent);
 }
+
+[data-palette='sunrise'] {
+  color-scheme: light;
+  --color-base-950: #fff3ea;
+  --color-base-900: #ffffff;
+  --color-base-800: #ffe1cc;
+  --color-base-700: #f8c7a6;
+  --color-base-500: #b08470;
+  --color-base-400: #7d5646;
+  --color-base-300: #523429;
+  --color-base-200: #36211a;
+  --color-base-100: #24140f;
+  --color-accent: #ff6326;
+  --color-accent-strong: #f0500f;
+  --color-on-accent: #24140f;
+  --color-pop: #ff9f1a;
+  --color-flame: #ffc23d;
+  --color-flame-2: #ff4d2e;
+  --color-flame-core: #ffe58a;
+  --color-cardback: #ff6326;
+  --color-cardback-2: #f0500f;
+  --color-select: var(--color-base-200);
+  --color-on-select: #ffffff;
+}
+
+[data-palette='berry'] {
+  color-scheme: light;
+  --color-base-950: #fbf0f7;
+  --color-base-900: #ffffff;
+  --color-base-800: #f5d9ea;
+  --color-base-700: #ebbcd8;
+  --color-base-500: #a77a95;
+  --color-base-400: #77506a;
+  --color-base-300: #4d2f43;
+  --color-base-200: #331d2c;
+  --color-base-100: #21111c;
+  --color-accent: #e0267d;
+  --color-accent-strong: #c81a6b;
+  --color-on-accent: #ffffff;
+  --color-pop: #ff8a00;
+  --color-flame: #ffb03d;
+  --color-flame-2: #ff2d75;
+  --color-flame-core: #ffe0a0;
+  --color-cardback: #e0267d;
+  --color-cardback-2: #c81a6b;
+  --color-select: var(--color-accent);
+  --color-on-select: var(--color-on-accent);
+}
+
+[data-palette='mint'] {
+  color-scheme: light;
+  --color-base-950: #e9f7f3;
+  --color-base-900: #ffffff;
+  --color-base-800: #cdeee4;
+  --color-base-700: #a9dfcf;
+  --color-base-500: #6b9a8c;
+  --color-base-400: #426b5f;
+  --color-base-300: #284a40;
+  --color-base-200: #17322b;
+  --color-base-100: #0c211c;
+  --color-accent: #0e8f7e;
+  --color-accent-strong: #0a7a6b;
+  --color-on-accent: #ffffff;
+  --color-pop: #ff6a2b;
+  --color-flame: #ffc23d;
+  --color-flame-2: #ff4d2e;
+  --color-flame-core: #ffe58a;
+  --color-cardback: #0e8f7e;
+  --color-cardback-2: #0a7a6b;
+  --color-select: var(--color-accent);
+  --color-on-select: var(--color-on-accent);
+}
+
