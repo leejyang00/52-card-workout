@@ -1,3 +1,4 @@
+import { useLayoutEffect } from 'react'
 import { useLocalStorage } from './hooks/useLocalStorage'
 import { useSession } from './hooks/useSession'
 import { DEFAULT_SETTINGS } from './lib/settings'
@@ -9,6 +10,13 @@ import { WorkoutScreen } from './screens/WorkoutScreen'
 export default function App() {
   const [settings, setSettings] = useLocalStorage<Settings>('cw:settings:v1', DEFAULT_SETTINGS)
   const { session, start, flip, undo, pause, resume, finish, reset } = useSession()
+  const screen = session?.finishedAt ? 'summary' : session ? 'workout' : 'setup'
+
+  // Screens swap in place, so the window keeps the previous screen's scroll
+  // position. Start each new screen at the top.
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0)
+  }, [screen])
 
   if (session?.finishedAt) {
     return <SummaryScreen session={session} onRestart={() => start(session.settings)} onDone={reset} />
