@@ -10,10 +10,8 @@ Burno already has a big advantage. The summary screen makes a 1080×1920 story-s
 
 Sending traffic before these are in place wastes your one shot with each audience.
 
-- [ ] **Link-preview image.** `index.html` has `og:title` but no `og:image`, and `twitter:card` is `summary`. Pasted links in WhatsApp, iMessage, Discord and X show a plain text box.
-  - [ ] Design a 1200×630 preview image (a fanned deck plus "Flip. Burn. Repeat.")
-  - [ ] Add `og:image`, `og:url`, and a canonical link to `https://burno.app`
-  - [ ] Change `twitter:card` to `summary_large_image`
+- [x] **Link-preview image.** Already on `main`: `og:image` (1200×630), `og:url`, and `summary_large_image`.
+- [ ] **Search engines.** Register with Google and Bing, and fix the SEO gaps. See [SEO.md](SEO.md).
 - [ ] **Analytics.** Use Plausible, Umami or Cloudflare Web Analytics (free or cheap, no cookie banner needed).
   - [ ] Track three events: workout started, workout finished, share tapped
 - [ ] **Make it installable.** Add a PWA manifest and icons so people can add it to their home screen.
