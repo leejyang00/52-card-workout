@@ -1,4 +1,5 @@
-import { isRed, SUIT_SYMBOL } from '../lib/deck'
+import { isFaceCard, isRed, SUIT_SYMBOL } from '../lib/deck'
+import { CourtArt, JokerArt } from './CourtArt'
 import type { Card } from '../lib/types'
 
 const SIZE = 'aspect-[5/7] w-44 sm:w-52 rounded-2xl'
@@ -7,9 +8,13 @@ export function PlayingCard({ card }: { card: Card }) {
   if (card.kind === 'joker') {
     return (
       <div
-        className={`${SIZE} flex flex-col items-center justify-center gap-2 bg-white text-card-ink shadow-2xl shadow-black/50 motion-safe:animate-flip-in`}
+        role="img"
+        aria-label="Joker"
+        className={`${SIZE} flex flex-col items-center justify-center gap-2 bg-white px-6 py-5 text-card-ink shadow-2xl shadow-black/50 motion-safe:animate-flip-in`}
       >
-        <span className="text-6xl">🃏</span>
+        <div className="min-h-0 w-full flex-1">
+          <JokerArt />
+        </div>
         <span className="text-lg font-black tracking-[0.3em]">JOKER</span>
       </div>
     )
@@ -32,7 +37,13 @@ export function PlayingCard({ card }: { card: Card }) {
     >
       <div className="absolute top-3 left-3">{corner}</div>
       <div className="absolute right-3 bottom-3 rotate-180">{corner}</div>
-      <div className="absolute inset-0 grid place-items-center text-8xl sm:text-9xl">{symbol}</div>
+      {isFaceCard(card) ? (
+        <div className="absolute inset-x-10 inset-y-5 overflow-hidden rounded-md border-2 border-current">
+          <CourtArt rank={card.rank as 'J' | 'Q' | 'K'} suit={card.suit} />
+        </div>
+      ) : (
+        <div className="absolute inset-0 grid place-items-center text-8xl sm:text-9xl">{symbol}</div>
+      )}
     </div>
   )
 }
