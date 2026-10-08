@@ -12,6 +12,11 @@ export interface Release {
 export const RELEASES: Release[] = [
   {
     date: '2026-10-08',
+    title: 'Real number cards',
+    changes: ['Number cards now show the right count of suits, like a real deck: the 5 of hearts has five hearts.'],
+  },
+  {
+    date: '2026-10-08',
     title: 'Jokers with a timer',
     changes: [
       'A joker now asks you to pick: a 60-second rest or 30 seconds all out, with a countdown either way.',

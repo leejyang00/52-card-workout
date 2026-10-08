@@ -1,6 +1,25 @@
 import { isFaceCard, isRed, SUIT_SYMBOL } from '../lib/deck'
 import { CourtArt, JokerArt } from './CourtArt'
-import type { Card } from '../lib/types'
+import type { Card, Rank } from '../lib/types'
+
+/** Pip centres as [column, row] fractions of the pip area: 0 = left/top, 1 = right/bottom. */
+const L = 0
+const M = 0.5
+const R = 1
+const PIPS: Partial<Record<Rank, [number, number][]>> = {
+  '2': [[M, 0], [M, 1]],
+  '3': [[M, 0], [M, 0.5], [M, 1]],
+  '4': [[L, 0], [R, 0], [L, 1], [R, 1]],
+  '5': [[L, 0], [R, 0], [M, 0.5], [L, 1], [R, 1]],
+  '6': [[L, 0], [R, 0], [L, 0.5], [R, 0.5], [L, 1], [R, 1]],
+  '7': [[L, 0], [R, 0], [M, 0.25], [L, 0.5], [R, 0.5], [L, 1], [R, 1]],
+  '8': [[L, 0], [R, 0], [M, 0.25], [L, 0.5], [R, 0.5], [M, 0.75], [L, 1], [R, 1]],
+  '9': [[L, 0], [R, 0], [L, 1 / 3], [R, 1 / 3], [M, 0.5], [L, 2 / 3], [R, 2 / 3], [L, 1], [R, 1]],
+  '10': [
+    [L, 0], [R, 0], [M, 1 / 6], [L, 1 / 3], [R, 1 / 3],
+    [L, 2 / 3], [R, 2 / 3], [M, 5 / 6], [L, 1], [R, 1],
+  ],
+}
 
 const SIZE = 'aspect-[5/7] w-44 sm:w-52 rounded-2xl'
 
@@ -41,8 +60,20 @@ export function PlayingCard({ card }: { card: Card }) {
         <div className="absolute inset-x-10 inset-y-5 overflow-hidden rounded-md border-2 border-current">
           <CourtArt rank={card.rank as 'J' | 'Q' | 'K'} suit={card.suit} />
         </div>
-      ) : (
+      ) : card.rank === 'A' ? (
         <div className="absolute inset-0 grid place-items-center text-8xl sm:text-9xl">{symbol}</div>
+      ) : (
+        <div className="absolute inset-x-15 inset-y-9 text-[1.75rem] leading-none sm:inset-x-[4.5rem] sm:inset-y-10 sm:text-[2rem]">
+          {PIPS[card.rank]?.map(([x, y], i) => (
+            <span
+              key={i}
+              className={`absolute -translate-1/2 ${y > 0.5 ? 'rotate-180' : ''}`}
+              style={{ left: `${x * 100}%`, top: `${y * 100}%` }}
+            >
+              {symbol}
+            </span>
+          ))}
+        </div>
       )}
     </div>
   )
