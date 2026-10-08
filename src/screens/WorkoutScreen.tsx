@@ -28,6 +28,8 @@ export function WorkoutScreen({ session, onFlip, onUndo, onPause, onResume, onFi
   const current = flipped > 0 ? deck[flipped - 1] : null
   const task = current ? taskFor(current, settings) : null
   const remaining = deck.length - flipped
+  const totals = moveTotals(deck, flipped, settings)
+  const repsDone = totals.reduce((sum, t) => sum + t.done, 0)
   const done = remaining === 0
   useWakeLock(running)
 
@@ -111,8 +113,10 @@ export function WorkoutScreen({ session, onFlip, onUndo, onPause, onResume, onFi
 
         <aside className="flex flex-col gap-4">
           <section className="rounded-2xl bg-base-900/60 p-4 ring-1 ring-base-800">
-            <h2 className="mb-3 text-xs font-bold tracking-widest text-base-400 uppercase">Reps done</h2>
-            <MoveTotals totals={moveTotals(deck, flipped, settings)} />
+            <h2 className="mb-3 text-xs font-bold tracking-widest text-base-400 uppercase">
+              Reps done · <span className="tabular">{repsDone}</span>
+            </h2>
+            <MoveTotals totals={totals} showTotals={settings.showRepTotals ?? false} />
           </section>
           <section className="rounded-2xl bg-base-900/60 p-4 ring-1 ring-base-800">
             <h2 className="mb-3 text-xs font-bold tracking-widest text-base-400 uppercase">
