@@ -5,6 +5,8 @@ export interface Exercise {
   name: string
   /** Short coaching cue shown under the move. */
   note?: string
+  /** Tough enough for a joker's 30-second all-out burst. */
+  hard?: boolean
 }
 
 export interface ExerciseGroup {
@@ -17,14 +19,14 @@ export const EXERCISE_GROUPS: ExerciseGroup[] = [
     label: 'Bodyweight',
     exercises: [
       { name: 'Push-ups' },
-      { name: 'Burpees' },
+      { name: 'Burpees', hard: true },
       { name: 'Sit-ups' },
       { name: 'Crunches' },
       { name: 'Air squats' },
-      { name: 'Jump squats' },
+      { name: 'Jump squats', hard: true },
       { name: 'Lunges', note: 'Split evenly between legs' },
-      { name: 'Pike push-ups' },
-      { name: 'Mountain climbers', note: 'Each leg counts as one' },
+      { name: 'Pike push-ups', hard: true },
+      { name: 'Mountain climbers', note: 'Each leg counts as one', hard: true },
       { name: 'Jumping jacks' },
       { name: 'Leg raises' },
       { name: 'Glute bridges' },
@@ -33,20 +35,20 @@ export const EXERCISE_GROUPS: ExerciseGroup[] = [
   {
     label: 'Bar & dips',
     exercises: [
-      { name: 'Pull-ups' },
+      { name: 'Pull-ups', hard: true },
       { name: 'Chin-ups' },
-      { name: 'Dips' },
+      { name: 'Dips', hard: true },
       { name: 'Inverted rows' },
     ],
   },
   {
     label: 'Dumbbell / kettlebell',
     exercises: [
-      { name: 'Clean & Press', note: 'Squat-to-press' },
-      { name: 'Thrusters' },
+      { name: 'Clean & Press', note: 'Squat-to-press', hard: true },
+      { name: 'Thrusters', hard: true },
       { name: 'Goblet squats' },
-      { name: 'Kettlebell swings' },
-      { name: 'Dumbbell snatches', note: 'Alternate arms' },
+      { name: 'Kettlebell swings', hard: true },
+      { name: 'Dumbbell snatches', note: 'Alternate arms', hard: true },
       { name: 'Renegade rows' },
       { name: 'Bent-over rows' },
       { name: 'Romanian deadlifts' },
@@ -89,4 +91,24 @@ export function randomMoves(pool: MovePool, rng: () => number = Math.random): Pi
 /** Reads a stored pool, mapping the old two-way "Any gear" ('all') onto Mix. */
 export function toMovePool(value: unknown): MovePool {
   return value === 'mix' || value === 'gear' || value === 'bodyweight' ? value : value === 'all' ? 'mix' : 'bodyweight'
+}
+
+const GROUP_OF = new Map(EXERCISE_GROUPS.flatMap((g) => g.exercises.map((e) => [e.name, g.label])))
+
+/**
+ * Hard moves a joker can call, matched to the gear the workout already uses: bodyweight only when
+ * nothing needs gear, only gear when every move does, both for a mix. Custom moves count as bodyweight.
+ */
+export function jokerMoves({ moves, aceMove }: Pick<Settings, 'moves' | 'aceMove'>): string[] {
+  const groups = new Set([...Object.values(moves), aceMove].map((name) => GROUP_OF.get(name) ?? 'Bodyweight'))
+  const gearOnly = !groups.has('Bodyweight')
+  return EXERCISE_GROUPS.filter((g) => groups.has(g.label) || (g.label === 'Bodyweight' && !gearOnly))
+    .flatMap((g) => g.exercises)
+    .filter((e) => e.hard)
+    .map((e) => e.name)
+}
+
+export function pickJokerMove(settings: Pick<Settings, 'moves' | 'aceMove'>, rng: () => number = Math.random): string {
+  const options = jokerMoves(settings)
+  return options[Math.floor(rng() * options.length)]
 }
