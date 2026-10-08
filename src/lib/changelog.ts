@@ -12,6 +12,11 @@ export interface Release {
 export const RELEASES: Release[] = [
   {
     date: '2026-10-08',
+    title: 'Real number cards',
+    changes: ['Number cards now show the right count of suits, like a real deck: the 5 of hearts has five hearts.'],
+  },
+  {
+    date: '2026-10-08',
     title: 'Keep the surprise',
     changes: [
       "During a workout you now see the reps you've done, not how many are left.",
