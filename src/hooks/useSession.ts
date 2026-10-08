@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
 import { buildDeck } from '../lib/deck'
+import { pickJokerMove } from '../lib/exercises'
 import type { Card, Settings } from '../lib/types'
 import { useLocalStorage } from './useLocalStorage'
 
@@ -42,7 +43,7 @@ export function useSession() {
       (settings: Settings) =>
         setSession({
           settings,
-          deck: buildDeck(settings),
+          deck: buildDeck(settings).map((c) => (c.kind === 'joker' ? { ...c, move: pickJokerMove(settings) } : c)),
           flipped: 0,
           // The clock starts on the first flip, giving time to get set.
           clock: { accumulatedMs: 0, runningSince: null },

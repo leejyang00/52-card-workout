@@ -12,6 +12,14 @@ export interface Release {
 export const RELEASES: Release[] = [
   {
     date: '2026-10-08',
+    title: 'Jokers with a timer',
+    changes: [
+      'A joker now asks you to pick: a 60-second rest or 30 seconds all out, with a countdown either way.',
+      'The all-out move is picked for you, matched to your workout: no-gear, gear or a mix.',
+    ],
+  },
+  {
+    date: '2026-10-08',
     title: 'Picture cards',
     changes: [
       'Jacks, queens and kings now show a court figure, so face cards stand out mid-workout.',

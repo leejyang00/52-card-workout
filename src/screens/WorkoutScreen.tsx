@@ -1,10 +1,11 @@
 import { useEffect, useRef } from 'react'
 import { Button } from '../components/Button'
 import { DrawnPile } from '../components/DrawnPile'
+import { JokerTimer } from '../components/JokerTimer'
 import { MoveTotals } from '../components/MoveTotals'
 import { CardBack, PlayingCard } from '../components/PlayingCard'
 import { TimerBar } from '../components/TimerBar'
-import { isFaceCard, JOKER_REST_SECONDS, moveTotals, taskFor } from '../lib/deck'
+import { isFaceCard, moveTotals, taskFor } from '../lib/deck'
 import { exerciseNote } from '../lib/exercises'
 import { elapsedMs, type Session } from '../hooks/useSession'
 import { useNow } from '../hooks/useNow'
@@ -102,11 +103,8 @@ export function WorkoutScreen({ session, onFlip, onUndo, onPause, onResume, onFi
                 </p>
               </>
             )}
-            {task?.kind === 'rest' && (
-              <>
-                <p className="text-5xl font-black sm:text-6xl">Rest {JOKER_REST_SECONDS}s</p>
-                <p className="mt-2 text-base-400">Or 30 sec of your hardest move. Dealer's choice.</p>
-              </>
+            {task?.kind === 'joker' && current && (
+              <JokerTimer key={current.id} move={task.move} running={running} onResume={onResume} />
             )}
           </div>
         </section>

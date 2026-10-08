@@ -19,6 +19,7 @@ export const SUIT_LABEL: Record<Suit, string> = {
 
 export const ACE_REPS = 20
 export const JOKER_REST_SECONDS = 60
+export const JOKER_MOVE_SECONDS = 30
 
 export function isRed(suit: Suit): boolean {
   return suit === 'hearts' || suit === 'diamonds'
@@ -66,7 +67,7 @@ export function rankReps(rank: Rank, capFaceCards: boolean): number {
 }
 
 export function taskFor(card: Card, settings: Settings): Task {
-  if (card.kind === 'joker') return { kind: 'rest', seconds: JOKER_REST_SECONDS }
+  if (card.kind === 'joker') return { kind: 'joker', move: card.move ?? 'Burpees' }
   const isAce = card.rank === 'A'
   return {
     kind: 'move',

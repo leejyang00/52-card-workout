@@ -34,14 +34,15 @@ describe('reps', () => {
     expect(rankReps('A', true)).toBe(20)
   })
 
-  it('sends aces to the wildcard move and jokers to rest', () => {
+  it('sends aces to the wildcard move and jokers to their hard move', () => {
     expect(taskFor({ id: 'A-hearts', kind: 'standard', suit: 'hearts', rank: 'A' }, DEFAULT_SETTINGS)).toEqual({
       kind: 'move',
       move: 'Lunges',
       reps: 20,
       isAce: true,
     })
-    expect(taskFor({ id: 'joker-1', kind: 'joker' }, DEFAULT_SETTINGS).kind).toBe('rest')
+    expect(taskFor({ id: 'joker-1', kind: 'joker', move: 'Thrusters' }, DEFAULT_SETTINGS)).toEqual({ kind: 'joker', move: 'Thrusters' })
+    expect(taskFor({ id: 'joker-1', kind: 'joker' }, DEFAULT_SETTINGS)).toEqual({ kind: 'joker', move: 'Burpees' })
   })
 
   it('totals a full deck at 90 reps per suit and 80 for aces', () => {

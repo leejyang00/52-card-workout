@@ -3,7 +3,8 @@ export type Rank = 'A' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | 
 
 export type Card =
   | { id: string; kind: 'standard'; suit: Suit; rank: Rank }
-  | { id: string; kind: 'joker' }
+  /** `move` is the hard move this joker calls; missing on sessions saved before jokers had one. */
+  | { id: string; kind: 'joker'; move?: string }
 
 export type DeckSize = 'full' | 'half'
 export type TimerMode = 'up' | 'down'
@@ -24,4 +25,4 @@ export interface Settings {
 /** What a flipped card asks you to do. */
 export type Task =
   | { kind: 'move'; move: string; reps: number; isAce: boolean }
-  | { kind: 'rest'; seconds: number }
+  | { kind: 'joker'; move: string }

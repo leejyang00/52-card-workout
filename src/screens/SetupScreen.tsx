@@ -200,7 +200,7 @@ export function SetupScreen({ settings, onChange, onStart }: Props) {
           <div className="mt-1 divide-y divide-base-800">
             <Toggle
               label="Add jokers"
-              description="1-minute rest, or 30 sec of your hardest move"
+              description="Your pick: a 1-minute rest, or 30 sec all out on a hard move"
               checked={settings.jokers}
               onChange={(v) => set('jokers', v)}
             />
