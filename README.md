@@ -22,6 +22,7 @@ Classic moves: ♥ Push-ups · ♠ Clean & Press · ♣ Burpees · ♦ Sit-ups. 
 - **Survives reloads:** settings and the workout in progress are saved in the browser (localStorage). No backend, no accounts
 - **Keeps the screen awake** while the timer runs (where supported)
 - **How it works** sheet that opens on a first visit and can be reopened from the setup screen
+- **What's new:** gift button top-left on the setup screen opens a dated changelog. A red dot shows returning visitors there's a release they haven't seen; first-time visitors start caught up
 - **Share card:** a 1080×1920 story image of the workout (time, cards, reps, breakdown, site link). Uses the native share menu on phones, with Save image / Copy caption as fallbacks
 
 The product name and tagline live in `src/lib/brand.ts`, so a rebrand is a one-file change.
@@ -44,6 +45,10 @@ src/
   components/  reusable UI (card, timer, selects, toggles…)
   screens/     Setup → Workout → Summary
 ```
+
+## What's new
+
+When you ship something people would notice, add an entry to the **top** of `RELEASES` in `src/lib/changelog.ts` (date, short title, one-line changes). Everyone who hasn't opened the sheet since sees a red dot on the button. A release is tracked by its date + title, so editing either brings the dot back.
 
 ## Deploy
 
