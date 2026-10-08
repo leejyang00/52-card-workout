@@ -9,6 +9,7 @@ import { Segmented } from '../components/Segmented'
 import { SuitBadge } from '../components/SuitBadge'
 import { ThemeToggle } from '../components/ThemeToggle'
 import { Toggle } from '../components/Toggle'
+import { WhatsNew } from '../components/WhatsNew'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import { BRAND } from '../lib/brand'
 import { ACE_REPS, SUIT_LABEL, SUITS } from '../lib/deck'
@@ -58,6 +59,7 @@ export function SetupScreen({ settings, onChange, onStart }: Props) {
   return (
     <div className="mx-auto flex min-h-dvh max-w-xl flex-col px-4 pt-8 pb-32 sm:pt-12">
       <header className="relative mb-6 text-center">
+        <WhatsNew firstVisit={!introSeen} className="absolute -top-2 left-0" />
         <ThemeToggle className="absolute -top-2 right-0" />
         <BrandHero />
         <button
