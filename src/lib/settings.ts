@@ -11,6 +11,7 @@ export const DEFAULT_SETTINGS: Settings = {
   deckSize: 'full',
   jokers: false,
   capFaceCards: false,
+  showRepTotals: false,
   timerMode: 'up',
   timerMinutes: 45,
 }

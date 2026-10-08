@@ -17,6 +17,14 @@ export const RELEASES: Release[] = [
   },
   {
     date: '2026-10-08',
+    title: 'Keep the surprise',
+    changes: [
+      "During a workout you now see the reps you've done, not how many are left.",
+      'Want the full count back? Turn on Show rep totals in setup.',
+    ],
+  },
+  {
+    date: '2026-10-08',
     title: 'Jokers with a timer',
     changes: [
       'A joker now asks you to pick: a 60-second rest or 30 seconds all out, with a countdown either way.',

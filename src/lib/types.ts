@@ -17,6 +17,8 @@ export interface Settings {
   deckSize: DeckSize
   jokers: boolean
   capFaceCards: boolean
+  /** Show each move's deck total during the workout. Missing in older saved settings, which reads as off. */
+  showRepTotals?: boolean
   timerMode: TimerMode
   /** Countdown length; ignored when counting up. */
   timerMinutes: number
