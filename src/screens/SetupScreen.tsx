@@ -210,6 +210,12 @@ export function SetupScreen({ settings, onChange, onStart }: Props) {
               checked={settings.capFaceCards}
               onChange={(v) => set('capFaceCards', v)}
             />
+            <Toggle
+              label="Show rep totals"
+              description="See how many reps are left while you work. Off keeps it a surprise."
+              checked={settings.showRepTotals ?? false}
+              onChange={(v) => set('showRepTotals', v)}
+            />
           </div>
         </Section>
 
