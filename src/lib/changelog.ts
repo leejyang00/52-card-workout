@@ -12,6 +12,15 @@ export interface Release {
 export const RELEASES: Release[] = [
   {
     date: '2026-10-09',
+    title: "You're one of many",
+    changes: [
+      'The home screen shows how many Burno workouts people have done so far.',
+      "Finish a workout to see your number, like \"You're Burno workout #1,285\", plus everyone's reps added up.",
+      "Any workout counts, even if you didn't clear the deck. Only card and rep counts are sent, nothing personal.",
+    ],
+  },
+  {
+    date: '2026-10-09',
     title: 'See your pace',
     changes: [
       'The summary now shows your average time per card and per rep.',

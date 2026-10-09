@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Button } from '../components/Button'
+import { CommunityFinished } from '../components/CommunityCount'
 import { ExternalLink } from '../components/ExternalLink'
 import { FeedbackSheet, Stars } from '../components/FeedbackSheet'
 import { MoveTotals } from '../components/MoveTotals'
@@ -59,6 +60,7 @@ export function SummaryScreen({ session, onRestart, onDone }: Props) {
               ? 'Every card, no skipping.'
               : 'Good work. Finish the deck next time.'}
         </p>
+        <CommunityFinished finishedAt={finishedAt} cards={flipped} reps={reps} />
       </header>
 
       <dl className="mt-8 grid grid-cols-3 gap-2">

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { BrandHero } from '../components/BrandHero'
 import { Button } from '../components/Button'
+import { CommunityInvite } from '../components/CommunityCount'
 import { ExerciseSelect } from '../components/ExerciseSelect'
 import { ExternalLink } from '../components/ExternalLink'
 import { FeedbackSheet } from '../components/FeedbackSheet'
@@ -62,6 +63,7 @@ export function SetupScreen({ settings, onChange, onStart }: Props) {
         <WhatsNew firstVisit={!introSeen} className="absolute -top-2 left-0" />
         <ThemeToggle className="absolute -top-2 right-0" />
         <BrandHero />
+        <CommunityInvite />
         <button
           type="button"
           onClick={() => setIntroOpen(true)}

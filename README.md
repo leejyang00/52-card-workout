@@ -23,6 +23,7 @@ Classic moves: ♥ Push-ups · ♠ Clean & Press · ♣ Burpees · ♦ Sit-ups. 
 - **Keeps the screen awake** while the timer runs (where supported)
 - **How it works** sheet that opens on a first visit and can be reopened from the setup screen
 - **What's new:** gift button top-left on the setup screen opens a dated changelog. A red dot shows returning visitors there's a release they haven't seen; first-time visitors start caught up
+- **Community counter:** a running count of everyone's workouts and reps, on the home and summary screens (see below)
 - **Share card:** a 1080×1920 story image of the workout (time, cards, reps, breakdown, site link). Uses the native share menu on phones, with Save image / Copy caption as fallbacks
 
 The product name and tagline live in `src/lib/brand.ts`, so a rebrand is a one-file change.
@@ -78,3 +79,12 @@ Nothing appears during a workout. Each row also gets the person's time zone and 
    ```
 
 The first submission creates a **Feedback** tab with headers. For local testing, put `VITE_FEEDBACK_URL=…` in `.env.local`. After editing the script, use **Deploy → Manage deployments → Edit → New version** so the URL stays the same.
+
+## Community counter
+
+The same Apps Script keeps a running count of finished workouts and reps for everyone:
+
+- **Home screen:** "🔥 1,284 workouts done by the Burno crowd. Join them." (read with a GET to the web app URL).
+- **Summary screen:** "You're Burno workout #1,285 🎉" and "Together: 3.1M reps and counting."
+
+Any workout with at least one card flipped counts, once, even if the summary is reloaded. The app sends only `{ type: 'finish', cards, reps }`, and the script rejects anything over 54 cards or 1,000 reps. Totals live in the script's **Project Settings → Script properties** (`workouts`, `reps`), so you can view, reset or seed them there. If the URL isn't set or a request fails, the lines just don't show.
