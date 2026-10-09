@@ -11,6 +11,15 @@ export interface Release {
  */
 export const RELEASES: Release[] = [
   {
+    date: '2026-10-09',
+    title: 'See your pace',
+    changes: [
+      'The summary now shows your average time per card and per rep.',
+      'A chart of every card shows where you sped up or slowed down, with first half vs. second half.',
+      'Compare your pace by exercise or by suit.',
+    ],
+  },
+  {
     date: '2026-10-08',
     title: 'Real number cards',
     changes: ['Number cards now show the right count of suits, like a real deck: the 5 of hearts has five hearts.'],

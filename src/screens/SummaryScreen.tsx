@@ -3,11 +3,13 @@ import { Button } from '../components/Button'
 import { ExternalLink } from '../components/ExternalLink'
 import { FeedbackSheet, Stars } from '../components/FeedbackSheet'
 import { MoveTotals } from '../components/MoveTotals'
+import { PaceReport } from '../components/PaceReport'
 import { ShareSheet } from '../components/ShareSheet'
 import { BRAND } from '../lib/brand'
 import { moveTotals } from '../lib/deck'
 import { feedbackEnabled } from '../lib/feedback'
 import { formatDuration } from '../lib/format'
+import { cardTimes } from '../lib/pace'
 import type { Session } from '../hooks/useSession'
 
 interface Props {
@@ -17,11 +19,12 @@ interface Props {
 }
 
 export function SummaryScreen({ session, onRestart, onDone }: Props) {
-  const { deck, flipped, settings, clock, finishedAt } = session
+  const { deck, flipped, splits, settings, clock, finishedAt } = session
   const [shareOpen, setShareOpen] = useState(false)
   const totals = moveTotals(deck, flipped, settings)
   const reps = totals.reduce((sum, t) => sum + t.done, 0)
   const cleared = flipped === deck.length
+  const times = cardTimes(deck, flipped, splits, clock.accumulatedMs, settings)
   const countdownMs = settings.timerMinutes * 60_000
   const beatClock = settings.timerMode === 'down' && cleared && clock.accumulatedMs <= countdownMs
 
@@ -71,6 +74,8 @@ export function SummaryScreen({ session, onRestart, onDone }: Props) {
         <h2 className="mb-3 text-xs font-bold tracking-widest text-base-400 uppercase">Breakdown</h2>
         <MoveTotals totals={totals} />
       </section>
+
+      {times && <PaceReport times={times} settings={settings} />}
 
       {feedbackEnabled && cardState !== 'dismissed' && (
         <section className="relative mt-4 flex flex-col items-center rounded-2xl bg-base-900/60 p-4 text-center ring-1 ring-base-800">
