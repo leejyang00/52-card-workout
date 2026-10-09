@@ -1,9 +1,10 @@
 /**
- * Burno feedback → Google Sheet.
+ * Burno feedback → Google Sheet, plus the community workout counter.
  *
  * Paste into Extensions → Apps Script of the feedback spreadsheet, then
  * Deploy → New deployment → Web app (Execute as: Me, Who has access: Anyone).
- * The app POSTs JSON as text/plain (see src/lib/feedback.ts). Setup steps are in the README.
+ * The app POSTs JSON as text/plain (see src/lib/feedback.ts and src/lib/community.ts).
+ * Setup steps are in the README.
  */
 
 const SHEET_NAME = 'Feedback'
@@ -12,6 +13,8 @@ const HEADERS = [
   'Time zone', 'Language', 'Cleared deck', 'Cards', 'Reps', 'Minutes',
 ]
 const MAX = { comment: 2000, name: 60, email: 120, short: 60 }
+// Most a single finished workout can add: a full deck with jokers is 54 cards and well under 1,000 reps.
+const FINISH_MAX = { cards: 54, reps: 1000 }
 
 function doPost(e) {
   let data
@@ -20,6 +23,8 @@ function doPost(e) {
   } catch (err) {
     return reply({ ok: false, error: 'bad json' })
   }
+
+  if (data.type === 'finish') return countFinish(data)
 
   // Honeypot: people never see this field, bots fill it in. Pretend it worked.
   if (data.website) return reply({ ok: true })
@@ -57,9 +62,40 @@ function doPost(e) {
   return reply({ ok: true })
 }
 
-/** Lets you open the web app URL in a browser to check it's live. */
+/**
+ * A finished workout: adds one to the community totals and replies with the new totals, so the
+ * app can say "You're Burno workout #N". No personal data is sent or kept.
+ */
+function countFinish(data) {
+  const cards = Math.round(num(data.cards))
+  const reps = Math.round(num(data.reps))
+  if (cards < 1 || cards > FINISH_MAX.cards || reps < 0 || reps > FINISH_MAX.reps) {
+    return reply({ ok: false, error: 'out of range' })
+  }
+
+  const lock = LockService.getScriptLock()
+  lock.waitLock(10000)
+  try {
+    const t = totals()
+    const next = { workouts: t.workouts + 1, reps: t.reps + reps }
+    PropertiesService.getScriptProperties().setProperties({
+      workouts: String(next.workouts),
+      reps: String(next.reps),
+    })
+    return reply({ ok: true, ...next })
+  } finally {
+    lock.releaseLock()
+  }
+}
+
+function totals() {
+  const p = PropertiesService.getScriptProperties()
+  return { workouts: num(p.getProperty('workouts')), reps: num(p.getProperty('reps')) }
+}
+
+/** The community totals for the home screen. Also lets you open the URL in a browser to check it's live. */
 function doGet() {
-  return reply({ ok: true, service: 'burno-feedback' })
+  return reply({ ok: true, service: 'burno-feedback', ...totals() })
 }
 
 function sheet() {
