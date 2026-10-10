@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { cardLabel, SUIT_LABEL, SUIT_SYMBOL } from '../lib/deck'
+import { cardLabel, cardName, SUIT_LABEL, SUIT_SYMBOL } from '../lib/deck'
 import { formatPerRep, formatSplit } from '../lib/format'
 import { paceByMove, paceBySuit, paceSummary, type CardTime, type PaceGroup } from '../lib/pace'
 import type { Settings } from '../lib/types'
@@ -38,12 +38,10 @@ export function PaceReport({ times, settings }: { times: CardTime[]; settings: S
 
       <CardChart times={times} avgMs={summary.perCardMs} />
 
-      <p className="mt-2 text-xs text-base-400">
-        Quickest <b className="text-base-100">{cardLabel(summary.fastest.card)}</b> in{' '}
-        <span className="tabular">{formatSplit(summary.fastest.ms)}</span> · Longest{' '}
-        <b className="text-base-100">{cardLabel(summary.slowest.card)}</b> in{' '}
-        <span className="tabular">{formatSplit(summary.slowest.ms)}</span>
-      </p>
+      <dl className="mt-3 grid grid-cols-2 gap-2">
+        <Extreme name="Quickest card" time={summary.fastest} />
+        <Extreme name="Longest card" time={summary.slowest} />
+      </dl>
 
       <div className="mt-5 mb-3">
         <Segmented
@@ -61,6 +59,22 @@ export function PaceReport({ times, settings }: { times: CardTime[]; settings: S
         <p className="mt-3 text-xs text-base-400">Jokers run on their own timer, so they're left out of pace.</p>
       )}
     </section>
+  )
+}
+
+/** The quickest or longest card: the exercise it asked for, which card it was and how long it took. */
+function Extreme({ name, time }: { name: string; time: CardTime }) {
+  return (
+    <div className="rounded-xl bg-base-950/60 px-3 py-2 ring-1 ring-base-800">
+      <dt className="text-xs font-semibold text-base-400">{name}</dt>
+      <dd>
+        <p className="tabular text-lg font-black">{formatSplit(time.ms)}</p>
+        <p className="text-sm font-semibold">
+          {time.reps} {time.move}
+        </p>
+        <p className="truncate text-xs text-base-400">{cardName(time.card)}</p>
+      </dd>
+    </div>
   )
 }
 

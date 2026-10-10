@@ -8,10 +8,13 @@ export function formatDuration(ms: number): string {
   return h > 0 ? `${h}:${String(m).padStart(2, '0')}:${ss}` : `${m}:${ss}`
 }
 
-/** Short span for pace stats: 8_400 → "8s", 75_000 → "1:15". */
+/** Short span for pace stats, always in units: 8_400 → "8s", 75_000 → "1m 15s", 120_000 → "2m". */
 export function formatSplit(ms: number): string {
-  const s = Math.round(ms / 1000)
-  return s < 60 ? `${s}s` : formatDuration(ms)
+  const total = Math.round(Math.max(0, ms) / 1000)
+  const m = Math.floor(total / 60)
+  const s = total % 60
+  if (m === 0) return `${s}s`
+  return s === 0 ? `${m}m` : `${m}m ${s}s`
 }
 
 /** Time per rep to a tenth: 2_140 → "2.1s". */
