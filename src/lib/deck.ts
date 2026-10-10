@@ -110,3 +110,10 @@ export function moveTotals(deck: Card[], flipped: number, settings: Settings): M
 export function cardLabel(card: Card): string {
   return card.kind === 'joker' ? 'JKR' : `${card.rank}${SUIT_SYMBOL[card.suit]}`
 }
+
+const RANK_NAME: Partial<Record<Rank, string>> = { A: 'Ace', J: 'Jack', Q: 'Queen', K: 'King' }
+
+/** The card spelled out, e.g. "King of Spades". */
+export function cardName(card: Card): string {
+  return card.kind === 'joker' ? 'Joker' : `${RANK_NAME[card.rank] ?? card.rank} of ${SUIT_LABEL[card.suit]}`
+}

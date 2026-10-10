@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildDeck, moveTotals, rankReps, shuffle, taskFor } from './deck'
+import { buildDeck, cardName, moveTotals, rankReps, shuffle, taskFor } from './deck'
 import { DEFAULT_SETTINGS } from './settings'
 
 describe('buildDeck', () => {
@@ -51,5 +51,14 @@ describe('reps', () => {
     const byMove = Object.fromEntries(totals.map((t) => [t.move, t.total]))
     expect(totals.map((t) => t.move)).toEqual(['Push-ups', 'Clean & Press', 'Burpees', 'Sit-ups', 'Lunges'])
     expect(byMove).toEqual({ 'Push-ups': 90, 'Clean & Press': 90, Burpees: 90, 'Sit-ups': 90, Lunges: 80 })
+  })
+})
+
+describe('cardName', () => {
+  it('spells out the rank and suit', () => {
+    expect(cardName({ id: 'A-clubs', kind: 'standard', suit: 'clubs', rank: 'A' })).toBe('Ace of Clubs')
+    expect(cardName({ id: 'K-spades', kind: 'standard', suit: 'spades', rank: 'K' })).toBe('King of Spades')
+    expect(cardName({ id: '7-hearts', kind: 'standard', suit: 'hearts', rank: '7' })).toBe('7 of Hearts')
+    expect(cardName({ id: 'joker-1', kind: 'joker' })).toBe('Joker')
   })
 })
