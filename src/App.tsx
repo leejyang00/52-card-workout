@@ -1,6 +1,7 @@
 import { useLayoutEffect } from 'react'
 import { useLocalStorage } from './hooks/useLocalStorage'
 import { useSession } from './hooks/useSession'
+import { trackWorkoutFinished, trackWorkoutStarted } from './lib/analytics'
 import { DEFAULT_SETTINGS } from './lib/settings'
 import type { Settings } from './lib/types'
 import { SetupScreen } from './screens/SetupScreen'
@@ -19,7 +20,16 @@ export default function App() {
   }, [screen])
 
   if (session?.finishedAt) {
-    return <SummaryScreen session={session} onRestart={() => start(session.settings)} onDone={reset} />
+    return (
+      <SummaryScreen
+        session={session}
+        onRestart={() => {
+          trackWorkoutStarted(session.settings, true)
+          start(session.settings)
+        }}
+        onDone={reset}
+      />
+    )
   }
 
   if (session) {
@@ -30,10 +40,22 @@ export default function App() {
         onUndo={undo}
         onPause={pause}
         onResume={resume}
-        onFinish={finish}
+        onFinish={() => {
+          trackWorkoutFinished(session)
+          finish()
+        }}
       />
     )
   }
 
-  return <SetupScreen settings={settings} onChange={setSettings} onStart={() => start(settings)} />
+  return (
+    <SetupScreen
+      settings={settings}
+      onChange={setSettings}
+      onStart={() => {
+        trackWorkoutStarted(settings)
+        start(settings)
+      }}
+    />
+  )
 }
