@@ -88,3 +88,27 @@ The same Apps Script keeps a running count of finished workouts and reps for eve
 - **Summary screen:** "You're Burno workout #1,285 🎉" and "Together: 3.1M reps and counting."
 
 Any workout with at least one card flipped counts, once, even if the summary is reloaded. The app sends only `{ type: 'finish', cards, reps }`, and the script rejects anything over 54 cards or 1,000 reps. Totals live in the script's **Project Settings → Script properties** (`workouts`, `reps`), so you can view, reset or seed them there. If the URL isn't set or a request fails, the lines just don't show.
+
+## Analytics → PostHog
+
+[PostHog](https://posthog.com) shows visitors, where they came from and whether they come back. Its free tier covers 1M events a month. PostHog loads after the app has rendered, using an anonymous id kept in localStorage (no cookies, no session recording). It records:
+
+- **`$pageview`**: every visit, with referrer and any `utm_*` tags on the link.
+- **`workout_started`**: deck size, jokers, timer mode, and whether it was a "go again".
+- **`workout_finished`**: cards flipped, deck length, cleared, reps, duration in seconds.
+
+Custom move names and feedback text are never sent. With no key configured, PostHog isn't loaded.
+
+**One-time setup:**
+
+1. Sign up at [posthog.com](https://posthog.com) and create a project (US or EU cloud).
+2. Copy the **Project API key** (`phc_…`) from **Settings → Project**.
+3. Save it as a repo variable, then redeploy:
+
+   ```sh
+   gh variable set POSTHOG_KEY --body "phc_…"
+   # EU cloud only:
+   gh variable set POSTHOG_HOST --body "https://eu.i.posthog.com"
+   ```
+
+Tag the links you share so each channel shows up separately, e.g. `https://burno.app/?utm_source=reddit`. For local testing, put `VITE_POSTHOG_KEY=…` in `.env.local`.
