@@ -11,6 +11,14 @@ export interface Release {
  */
 export const RELEASES: Release[] = [
   {
+    date: '2026-10-13',
+    title: 'Your plan, mid-workout',
+    changes: [
+      'Before your first flip, the workout screen lists which exercise each suit calls.',
+      'The reps panel shows each exercise with its suits, and highlights the one for the card in play.',
+    ],
+  },
+  {
     date: '2026-10-10',
     title: 'Clearer quickest and longest cards',
     changes: ['Your quickest and longest cards now show the exercise and reps, and name the card in full, like "King of Spades".'],

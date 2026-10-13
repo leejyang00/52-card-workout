@@ -4,8 +4,9 @@ import { DrawnPile } from '../components/DrawnPile'
 import { JokerTimer } from '../components/JokerTimer'
 import { MoveTotals } from '../components/MoveTotals'
 import { CardBack, PlayingCard } from '../components/PlayingCard'
+import { SuitBadge } from '../components/SuitBadge'
 import { TimerBar } from '../components/TimerBar'
-import { isFaceCard, moveTotals, taskFor } from '../lib/deck'
+import { isFaceCard, moveTotals, slotFor, SUIT_LABEL, taskFor } from '../lib/deck'
 import { exerciseNote } from '../lib/exercises'
 import { elapsedMs, type Session } from '../hooks/useSession'
 import { useNow } from '../hooks/useNow'
@@ -91,6 +92,19 @@ export function WorkoutScreen({ session, onFlip, onUndo, onPause, onResume, onFi
               <>
                 <p className="text-2xl font-bold">Ready when you are</p>
                 <p className="mt-1 text-base-400">Tap the deck or hit flip to draw your first card.</p>
+                {/* Wide screens show the plan in the reps panel beside the deck. */}
+                <ul aria-label="Your plan" className="mx-auto mt-5 grid w-fit gap-2 text-left lg:hidden">
+                  {totals.map(({ move, slots }) => (
+                    <li key={move} className="flex items-center gap-3">
+                      <span className="flex gap-0.5">
+                        {slots.map((slot) => (
+                          <SuitBadge key={slot} suit={slot} size="sm" label={slot === 'ace' ? 'Any ace' : SUIT_LABEL[slot]} />
+                        ))}
+                      </span>
+                      <span className="font-semibold">{move}</span>
+                    </li>
+                  ))}
+                </ul>
               </>
             )}
             {task?.kind === 'move' && (
@@ -116,7 +130,11 @@ export function WorkoutScreen({ session, onFlip, onUndo, onPause, onResume, onFi
             <h2 className="mb-3 text-xs font-bold tracking-widest text-base-400 uppercase">
               Reps done · <span className="tabular">{repsDone}</span>
             </h2>
-            <MoveTotals totals={totals} showTotals={settings.showRepTotals ?? false} />
+            <MoveTotals
+              totals={totals}
+              showTotals={settings.showRepTotals ?? false}
+              active={current ? slotFor(current) : null}
+            />
           </section>
           <section className="rounded-2xl bg-base-900/60 p-4 ring-1 ring-base-800">
             <h2 className="mb-3 text-xs font-bold tracking-widest text-base-400 uppercase">
