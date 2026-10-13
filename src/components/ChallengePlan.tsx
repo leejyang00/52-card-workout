@@ -1,9 +1,6 @@
 import type { ChallengeSettings } from '../lib/challenge'
-import { isRed, moveTotals, SUIT_LABEL, SUIT_SYMBOL, SUITS } from '../lib/deck'
-import type { Card, Suit } from '../lib/types'
-
-/** A suit, or every ace. */
-type SuitSlot = Suit | 'ace'
+import { isRed, moveTotals, SUIT_LABEL, SUIT_SYMBOL, type SuitSlot } from '../lib/deck'
+import type { Card } from '../lib/types'
 
 function SlotChip({ slot }: { slot: SuitSlot }) {
   const color = slot === 'ace' ? 'bg-accent text-on-accent' : `bg-white ${isRed(slot) ? 'text-suit-red' : 'text-card-ink'}`
@@ -21,11 +18,6 @@ function SlotChip({ slot }: { slot: SuitSlot }) {
 /** A challenge's workout at a glance: each move with its reps in this deck, then the rules. */
 export function ChallengePlan({ settings, deck }: { settings: ChallengeSettings; deck: Card[] }) {
   const totals = moveTotals(deck, 0, settings)
-  // Which suits call each move, so a move picked twice shows both.
-  const slots = (move: string): SuitSlot[] => [
-    ...SUITS.filter((suit) => settings.moves[suit] === move),
-    ...(settings.aceMove === move ? ['ace' as const] : []),
-  ]
   const reps = totals.reduce((sum, t) => sum + t.total, 0)
   const cards = deck.filter((c) => c.kind === 'standard').length
   const jokers = deck.length - cards
@@ -43,7 +35,7 @@ export function ChallengePlan({ settings, deck }: { settings: ChallengeSettings;
         {totals.map((t) => (
           <li key={t.move} className="flex items-center gap-3 py-2">
             <span className="flex shrink-0 gap-1">
-              {slots(t.move).map((slot) => (
+              {t.slots.map((slot) => (
                 <SlotChip key={slot} slot={slot} />
               ))}
             </span>
