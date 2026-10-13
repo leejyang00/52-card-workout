@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { BrandHero } from '../components/BrandHero'
 import { Button } from '../components/Button'
+import { ChallengeIcon, ChallengeSheet } from '../components/ChallengeSheet'
 import { CommunityInvite } from '../components/CommunityCount'
 import { ExerciseSelect } from '../components/ExerciseSelect'
 import { ExternalLink } from '../components/ExternalLink'
@@ -42,6 +43,7 @@ export function SetupScreen({ settings, onChange, onStart }: Props) {
     setIntroSeen(true)
   }
   const [feedbackOpen, setFeedbackOpen] = useState(false)
+  const [challengeOpen, setChallengeOpen] = useState(false)
   const [storedPool, setPool] = useLocalStorage<MovePool>('cw:shuffle-pool:v1', 'bodyweight')
   const pool = toMovePool(storedPool)
   // Bumped on every shuffle so each ExerciseSelect remounts and drops any open "Custom…" input.
@@ -260,12 +262,17 @@ export function SetupScreen({ settings, onChange, onStart }: Props) {
       </div>
 
       <div className="fixed inset-x-0 bottom-0 bg-gradient-to-t from-base-950 via-base-950/95 to-transparent px-4 pt-6 pb-[max(1rem,env(safe-area-inset-bottom))]">
-        <div className="mx-auto max-w-xl">
-          <Button variant="primary" size="lg" className="w-full" disabled={!allNamed} onClick={onStart}>
+        <div className="mx-auto flex max-w-xl gap-2">
+          <Button size="lg" className="px-4" disabled={!allNamed} onClick={() => setChallengeOpen(true)}>
+            <ChallengeIcon />
+            Challenge
+          </Button>
+          <Button variant="primary" size="lg" className="flex-1 px-4" disabled={!allNamed} onClick={onStart}>
             Shuffle &amp; start
           </Button>
         </div>
       </div>
+      <ChallengeSheet open={challengeOpen} onClose={() => setChallengeOpen(false)} source="setup" settings={settings} />
     </div>
   )
 }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Session } from '../hooks/useSession'
-import { finishProperties, startProperties } from './analytics'
+import { challengeLinkProperties, finishProperties, startProperties } from './analytics'
 import { DEFAULT_SETTINGS } from './settings'
 
 const session: Session = {
@@ -30,6 +30,19 @@ describe('finishProperties', () => {
 
   it('marks a cleared deck', () => {
     expect(finishProperties({ ...session, flipped: 3 }, 100_000).cleared).toBe(true)
+  })
+})
+
+describe('challenge analytics', () => {
+  it('reports the outcome against the sender, by link id', () => {
+    const challenged = { ...session, challenge: { id: 'abc', from: 'Sam', result: { flipped: 2, timeMs: 60_000 } } }
+    expect(finishProperties(challenged, 115_000)).toMatchObject({ challenge_id: 'abc', challenge_outcome: 'won' })
+    expect(finishProperties({ ...challenged, challenge: { id: 'abc' } }, 115_000).challenge_outcome).toBe('no_target')
+  })
+
+  it('never sends the name or moves from a link', () => {
+    const props = challengeLinkProperties({ id: 'abc', from: 'Sam', settings: DEFAULT_SETTINGS, deck: session.deck })
+    expect(props).toEqual({ challenge_id: 'abc', deck_size: 'full', jokers: false, has_target: false })
   })
 })
 

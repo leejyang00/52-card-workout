@@ -26,7 +26,7 @@ interface Props {
 
 type Status = 'idle' | 'sending' | 'sent' | 'error'
 
-const inputClass =
+export const inputClass =
   'w-full rounded-xl bg-base-800/60 px-3 py-2.5 text-base text-base-100 ring-1 ring-base-700 placeholder:text-base-500 focus:ring-2 focus:ring-accent focus:outline-none'
 
 export function Stars({ value, onChange, size = 'lg' }: { value: number; onChange: (v: number) => void; size?: 'md' | 'lg' }) {

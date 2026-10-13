@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Button } from '../components/Button'
+import { ChallengeIcon, ChallengeSheet } from '../components/ChallengeSheet'
 import { CommunityFinished } from '../components/CommunityCount'
 import { ExternalLink } from '../components/ExternalLink'
 import { FeedbackSheet, Stars } from '../components/FeedbackSheet'
@@ -7,9 +8,10 @@ import { MoveTotals } from '../components/MoveTotals'
 import { PaceReport } from '../components/PaceReport'
 import { ShareSheet } from '../components/ShareSheet'
 import { BRAND } from '../lib/brand'
+import { compareResults, type ChallengeRef, type ChallengeResult } from '../lib/challenge'
 import { moveTotals } from '../lib/deck'
 import { feedbackEnabled } from '../lib/feedback'
-import { formatDuration } from '../lib/format'
+import { formatDuration, formatSplit } from '../lib/format'
 import { cardTimes } from '../lib/pace'
 import type { Session } from '../hooks/useSession'
 
@@ -20,8 +22,10 @@ interface Props {
 }
 
 export function SummaryScreen({ session, onRestart, onDone }: Props) {
-  const { deck, flipped, splits, settings, clock, finishedAt } = session
+  const { deck, flipped, splits, settings, clock, finishedAt, challenge } = session
   const [shareOpen, setShareOpen] = useState(false)
+  const [challengeOpen, setChallengeOpen] = useState(false)
+  const result: ChallengeResult | undefined = flipped > 0 ? { flipped, timeMs: clock.accumulatedMs } : undefined
   const totals = moveTotals(deck, flipped, settings)
   const reps = totals.reduce((sum, t) => sum + t.done, 0)
   const cleared = flipped === deck.length
@@ -62,6 +66,8 @@ export function SummaryScreen({ session, onRestart, onDone }: Props) {
         </p>
         <CommunityFinished finishedAt={finishedAt} cards={flipped} reps={reps} />
       </header>
+
+      {challenge?.result && result && <HeadToHead you={result} challenge={challenge} rival={challenge.result} deckLength={deck.length} />}
 
       <dl className="mt-8 grid grid-cols-3 gap-2">
         {stats.map(([label, value]) => (
@@ -110,6 +116,10 @@ export function SummaryScreen({ session, onRestart, onDone }: Props) {
           </svg>
           Share workout
         </Button>
+        <Button size="lg" onClick={() => setChallengeOpen(true)}>
+          <ChallengeIcon />
+          {challenge?.from ? `Challenge ${challenge.from} back` : 'Challenge a friend'}
+        </Button>
         <div className="grid grid-cols-2 gap-2">
           <Button className="whitespace-nowrap" onClick={onRestart} aria-label="Same moves, new shuffle">
             <svg viewBox="0 0 20 20" fill="currentColor" className="size-5 shrink-0" aria-hidden>
@@ -143,6 +153,16 @@ export function SummaryScreen({ session, onRestart, onDone }: Props) {
         }}
       />
 
+      <ChallengeSheet
+        open={challengeOpen}
+        onClose={() => setChallengeOpen(false)}
+        source="summary"
+        settings={settings}
+        deck={deck}
+        result={result}
+        rival={challenge?.from}
+      />
+
       {feedbackEnabled && (
         <FeedbackSheet
           open={feedbackOpen}
@@ -154,5 +174,48 @@ export function SummaryScreen({ session, onRestart, onDone }: Props) {
         />
       )}
     </div>
+  )
+}
+
+interface HeadToHeadProps {
+  you: ChallengeResult
+  rival: ChallengeResult
+  challenge: ChallengeRef
+  deckLength: number
+}
+
+/** You against whoever sent the challenge. */
+function HeadToHead({ you, rival, challenge, deckLength }: HeadToHeadProps) {
+  const name = challenge.from ?? 'Your friend'
+  const them = challenge.from ?? 'your friend'
+  const outcome = compareResults(you, rival)
+  const title = { won: `You beat ${them}!`, lost: `${name} wins this one`, tied: `Dead heat with ${them}` }[outcome.kind]
+  const margin =
+    outcome.kind === 'tied'
+      ? 'Same cards, same time.'
+      : `by ${outcome.cards > 0 ? `${outcome.cards} ${outcome.cards === 1 ? 'card' : 'cards'}` : formatSplit(outcome.ms)}`
+
+  return (
+    <section
+      className={`mt-6 rounded-2xl p-4 text-center ring-1 ${outcome.kind === 'won' ? 'bg-accent/15 ring-accent/40' : 'bg-base-900/60 ring-base-800'}`}
+    >
+      <p className="text-xs font-bold tracking-widest text-base-400 uppercase">Challenge</p>
+      <h2 className="mt-1 text-2xl font-black">{title}</h2>
+      <p className="text-sm text-base-400">{margin}</p>
+      <dl className="mt-3 grid grid-cols-2 gap-2">
+        {[
+          { who: 'You', r: you },
+          { who: name, r: rival },
+        ].map(({ who, r }, i) => (
+          <div key={i} className="rounded-xl bg-base-800/60 px-2 py-2">
+            <dt className="truncate text-xs font-semibold text-base-400">{who}</dt>
+            <dd className="tabular text-lg font-black">{formatDuration(r.timeMs)}</dd>
+            <dd className="tabular text-xs text-base-400">
+              {r.flipped}/{deckLength} cards
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </section>
   )
 }
