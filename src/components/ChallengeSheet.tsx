@@ -96,37 +96,17 @@ export function ChallengeSheet({ open, onClose, source, settings, deck, result, 
               Copy link
             </Button>
           )}
-          <p role="status" className="min-h-5 text-center text-sm break-all text-base-400">
-            {notice}
-          </p>
+          {notice && (
+            <p role="status" className="text-center text-sm break-all text-base-400">
+              {notice}
+            </p>
+          )}
         </div>
       }
     >
-      <p className="text-base-300">
-        {result
-          ? `${rival ?? 'Your friend'} gets this exact deck, card for card, and your score to beat.`
-          : 'Your friend gets your moves and a shuffled deck. Everyone who opens this link flips the same cards in the same order.'}
-      </p>
-
-      {result && (
-        <div className="mt-4 flex items-center justify-between rounded-2xl bg-accent/15 px-4 py-3 ring-1 ring-accent/40">
-          <span className="text-sm font-bold">To beat</span>
-          <span className="tabular text-xl font-black">
-            {challenge && result.flipped < challenge.deck.length && `${result.flipped} cards · `}
-            {formatDuration(result.timeMs)}
-          </span>
-        </div>
-      )}
-
-      {challenge && (
-        <div className="mt-4 rounded-2xl bg-base-800/40 px-4 py-2 ring-1 ring-base-800">
-          <ChallengePlan settings={challenge.settings} deck={challenge.deck} />
-        </div>
-      )}
-
-      <label className="mt-4 block">
+      <label className="block">
         <span className="mb-1.5 block text-sm font-bold">
-          Your name <span className="font-normal text-base-400">(optional, so they know it's you)</span>
+          Your name <span className="font-normal text-base-400">(optional)</span>
         </span>
         <input
           type="text"
@@ -134,9 +114,33 @@ export function ChallengeSheet({ open, onClose, source, settings, deck, result, 
           maxLength={MAX_NAME}
           value={name}
           onChange={(e) => setName(e.target.value)}
+          placeholder="So they know it's you"
           className={inputClass}
         />
       </label>
+
+      {challenge && (
+        <section className="mt-4 rounded-2xl bg-base-800/40 px-4 pt-3 pb-2 ring-1 ring-base-800">
+          <h3 className="text-xs font-bold tracking-widest text-base-400 uppercase">
+            What {rival ?? 'they'} {rival ? 'gets' : 'get'}
+          </h3>
+          {result && (
+            <p className="mt-2 flex items-baseline justify-between rounded-xl bg-accent/15 px-3 py-2 ring-1 ring-accent/40">
+              <span className="text-sm font-bold">Your score to beat</span>
+              <span className="tabular text-lg font-black">
+                {result.flipped < challenge.deck.length && `${result.flipped} cards · `}
+                {formatDuration(result.timeMs)}
+              </span>
+            </p>
+          )}
+          <ChallengePlan settings={challenge.settings} deck={challenge.deck} compact />
+          <p className="mt-1 text-sm text-base-400">
+            {result
+              ? 'This exact deck, card for card.'
+              : 'A shuffled deck. Everyone who opens this link flips the same cards in the same order.'}
+          </p>
+        </section>
+      )}
     </Sheet>
   )
 }
