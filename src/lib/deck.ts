@@ -81,8 +81,24 @@ export function isFaceCard(card: Card): boolean {
   return card.kind === 'standard' && (card.rank === 'J' || card.rank === 'Q' || card.rank === 'K')
 }
 
+/** A suit, or every ace (aces share one move whatever their suit). */
+export type SuitSlot = Suit | 'ace'
+
+/** The slot a card's move comes from; jokers have none. */
+export function slotFor(card: Card): SuitSlot | null {
+  if (card.kind === 'joker') return null
+  return card.rank === 'A' ? 'ace' : card.suit
+}
+
+/** Each suit's move, then the ace move. */
+export function planSlots(settings: Settings): { slot: SuitSlot; move: string }[] {
+  return [...SUITS.map((slot) => ({ slot, move: settings.moves[slot] })), { slot: 'ace' as const, move: settings.aceMove }]
+}
+
 export interface MoveTotal {
   move: string
+  /** Slots that call this move, so a row can show its suits. */
+  slots: SuitSlot[]
   done: number
   total: number
 }
@@ -93,13 +109,15 @@ export interface MoveTotal {
  */
 export function moveTotals(deck: Card[], flipped: number, settings: Settings): MoveTotal[] {
   const totals = new Map<string, MoveTotal>()
-  for (const move of [...SUITS.map((s) => settings.moves[s]), settings.aceMove]) {
-    if (!totals.has(move)) totals.set(move, { move, done: 0, total: 0 })
+  for (const { slot, move } of planSlots(settings)) {
+    const entry = totals.get(move)
+    if (entry) entry.slots.push(slot)
+    else totals.set(move, { move, slots: [slot], done: 0, total: 0 })
   }
   deck.forEach((card, i) => {
     const task = taskFor(card, settings)
     if (task.kind !== 'move') return
-    const entry = totals.get(task.move) ?? { move: task.move, done: 0, total: 0 }
+    const entry = totals.get(task.move) ?? { move: task.move, slots: [], done: 0, total: 0 }
     entry.total += task.reps
     if (i < flipped) entry.done += task.reps
     totals.set(task.move, entry)

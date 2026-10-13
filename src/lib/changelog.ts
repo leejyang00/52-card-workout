@@ -20,6 +20,14 @@ export const RELEASES: Release[] = [
     ],
   },
   {
+    date: '2026-10-13',
+    title: 'Your plan, mid-workout',
+    changes: [
+      'The reps panel shows each exercise with its suits, so your plan stays on screen, and highlights the one for the card in play.',
+      'On smaller phones the card is a little smaller, so more of the panel fits.',
+    ],
+  },
+  {
     date: '2026-10-10',
     title: 'Clearer quickest and longest cards',
     changes: ['Your quickest and longest cards now show the exercise and reps, and name the card in full, like "King of Spades".'],

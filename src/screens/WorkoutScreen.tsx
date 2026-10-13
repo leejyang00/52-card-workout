@@ -5,7 +5,7 @@ import { JokerTimer } from '../components/JokerTimer'
 import { MoveTotals } from '../components/MoveTotals'
 import { CardBack, PlayingCard } from '../components/PlayingCard'
 import { TimerBar } from '../components/TimerBar'
-import { isFaceCard, moveTotals, taskFor } from '../lib/deck'
+import { isFaceCard, moveTotals, slotFor, taskFor } from '../lib/deck'
 import { exerciseNote } from '../lib/exercises'
 import { elapsedMs, type Session } from '../hooks/useSession'
 import { useNow } from '../hooks/useNow'
@@ -86,7 +86,8 @@ export function WorkoutScreen({ session, onFlip, onUndo, onPause, onResume, onFi
             {current ? <PlayingCard key={current.id} card={current} /> : <CardBack remaining={remaining} />}
           </button>
 
-          <div className="mt-6 min-h-28">
+          {/* Room for a two-line move so the layout holds still between flips; not needed before the first. */}
+          <div className={`mt-6 ${task ? 'min-h-28' : ''}`}>
             {!task && (
               <>
                 <p className="text-2xl font-bold">Ready when you are</p>
@@ -116,7 +117,11 @@ export function WorkoutScreen({ session, onFlip, onUndo, onPause, onResume, onFi
             <h2 className="mb-3 text-xs font-bold tracking-widest text-base-400 uppercase">
               Reps done · <span className="tabular">{repsDone}</span>
             </h2>
-            <MoveTotals totals={totals} showTotals={settings.showRepTotals ?? false} />
+            <MoveTotals
+              totals={totals}
+              showTotals={settings.showRepTotals ?? false}
+              active={current ? slotFor(current) : null}
+            />
           </section>
           <section className="rounded-2xl bg-base-900/60 p-4 ring-1 ring-base-800">
             <h2 className="mb-3 text-xs font-bold tracking-widest text-base-400 uppercase">
@@ -129,20 +134,20 @@ export function WorkoutScreen({ session, onFlip, onUndo, onPause, onResume, onFi
 
       <div className="fixed inset-x-0 bottom-0 z-10 border-t border-base-800 bg-base-950/95 px-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur">
         <div className="mx-auto flex max-w-xl gap-2">
-          <Button variant="ghost" size="lg" onClick={onUndo} disabled={flipped === 0} aria-label="Undo last flip">
+          <Button variant="ghost" size="lg" className="max-sm:px-3" onClick={onUndo} disabled={flipped === 0} aria-label="Undo last flip">
             Undo
           </Button>
           {done ? (
-            <Button variant="primary" size="lg" className="flex-1" onClick={onFinish}>
+            <Button variant="primary" size="lg" className="flex-1 whitespace-nowrap max-sm:px-4" onClick={onFinish}>
               Finish workout
             </Button>
           ) : (
-            <Button variant="primary" size="lg" className="flex-1" onClick={flip}>
+            <Button variant="primary" size="lg" className="flex-1 whitespace-nowrap max-sm:px-4" onClick={flip}>
               {flipped === 0 ? 'Flip first card' : 'Next card'}
             </Button>
           )}
           {!done && (
-            <Button variant="ghost" size="lg" onClick={confirmFinish}>
+            <Button variant="ghost" size="lg" className="max-sm:px-3" onClick={confirmFinish}>
               End
             </Button>
           )}
