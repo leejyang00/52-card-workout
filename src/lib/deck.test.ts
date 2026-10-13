@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildDeck, cardName, moveTotals, rankReps, shuffle, taskFor } from './deck'
+import { buildDeck, cardName, moveTotals, rankReps, shuffle, slotFor, taskFor } from './deck'
 import { DEFAULT_SETTINGS } from './settings'
 
 describe('buildDeck', () => {
@@ -51,6 +51,25 @@ describe('reps', () => {
     const byMove = Object.fromEntries(totals.map((t) => [t.move, t.total]))
     expect(totals.map((t) => t.move)).toEqual(['Push-ups', 'Clean & Press', 'Burpees', 'Sit-ups', 'Lunges'])
     expect(byMove).toEqual({ 'Push-ups': 90, 'Clean & Press': 90, Burpees: 90, 'Sit-ups': 90, Lunges: 80 })
+  })
+
+  it('lists the suits behind each move, merging suits that share one', () => {
+    const settings = { ...DEFAULT_SETTINGS, moves: { ...DEFAULT_SETTINGS.moves, diamonds: 'Burpees' } }
+    const totals = moveTotals(buildDeck({ deckSize: 'full', jokers: false }), 0, settings)
+    expect(totals.map((t) => [t.move, t.slots])).toEqual([
+      ['Push-ups', ['hearts']],
+      ['Clean & Press', ['spades']],
+      ['Burpees', ['clubs', 'diamonds']],
+      ['Lunges', ['ace']],
+    ])
+  })
+})
+
+describe('slotFor', () => {
+  it('maps aces to the ace slot and jokers to none', () => {
+    expect(slotFor({ id: '7-hearts', kind: 'standard', suit: 'hearts', rank: '7' })).toBe('hearts')
+    expect(slotFor({ id: 'A-clubs', kind: 'standard', suit: 'clubs', rank: 'A' })).toBe('ace')
+    expect(slotFor({ id: 'joker-1', kind: 'joker' })).toBeNull()
   })
 })
 

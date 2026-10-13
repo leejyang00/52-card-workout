@@ -21,7 +21,8 @@ const PIPS: Partial<Record<Rank, [number, number][]>> = {
   ],
 }
 
-const SIZE = 'aspect-[5/7] w-44 sm:w-52 rounded-2xl'
+// Zoom, not width, on short screens: the pips and corners are sized in rem and would crowd.
+const SIZE = 'aspect-[5/7] w-44 sm:w-52 rounded-2xl short:[zoom:0.8]'
 
 export function PlayingCard({ card }: { card: Card }) {
   if (card.kind === 'joker') {
