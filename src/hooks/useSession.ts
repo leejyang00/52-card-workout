@@ -1,4 +1,5 @@
 import { useCallback } from 'react'
+import type { ChallengeRef } from '../lib/challenge'
 import { buildDeck } from '../lib/deck'
 import { pickJokerMove } from '../lib/exercises'
 import type { Card, Settings } from '../lib/types'
@@ -23,6 +24,8 @@ export interface Session {
   splits?: number[]
   clock: Clock
   finishedAt: number | null
+  /** Set when this workout came from a friend's challenge link. */
+  challenge?: ChallengeRef
 }
 
 export function elapsedMs(clock: Clock, now: number): number {
@@ -32,6 +35,11 @@ export function elapsedMs(clock: Clock, now: number): number {
 function pauseClock(clock: Clock): Clock {
   if (clock.runningSince == null) return clock
   return { accumulatedMs: elapsedMs(clock, Date.now()), runningSince: null }
+}
+
+/** A shuffled deck for these settings, each joker with its hard move picked. */
+export function dealDeck(settings: Settings): Card[] {
+  return buildDeck(settings).map((c) => (c.kind === 'joker' ? { ...c, move: pickJokerMove(settings) } : c))
 }
 
 export function useSession() {
@@ -45,10 +53,12 @@ export function useSession() {
   return {
     session,
     start: useCallback(
-      (settings: Settings) =>
+      /** A challenge brings its own deck, already shuffled; otherwise a fresh one is dealt. */
+      (settings: Settings, challenge?: { deck: Card[]; ref: ChallengeRef }) =>
         setSession({
           settings,
-          deck: buildDeck(settings).map((c) => (c.kind === 'joker' ? { ...c, move: pickJokerMove(settings) } : c)),
+          deck: challenge?.deck ?? dealDeck(settings),
+          challenge: challenge?.ref,
           flipped: 0,
           splits: [],
           // The clock starts on the first flip, giving time to get set.

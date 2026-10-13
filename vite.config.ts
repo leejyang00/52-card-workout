@@ -6,4 +6,11 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   base: '/',
   plugins: [react(), tailwindcss()],
+  build: {
+    rollupOptions: {
+      // challenge.html is the same app with its own link preview. GitHub Pages serves it at
+      // /challenge, so challenge links work without a router.
+      input: { main: 'index.html', challenge: 'challenge.html' },
+    },
+  },
 })

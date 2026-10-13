@@ -12,6 +12,15 @@ export interface Release {
 export const RELEASES: Release[] = [
   {
     date: '2026-10-13',
+    title: 'Challenge a friend',
+    changes: [
+      'Send a friend a link to the workout you picked. They get your moves and the exact same shuffled deck.',
+      'Send it from your summary and your score comes along too, so they know what to beat.',
+      'When they finish, they see who won and can challenge you back.',
+    ],
+  },
+  {
+    date: '2026-10-13',
     title: 'Your plan, mid-workout',
     changes: [
       'The reps panel shows each exercise with its suits, so your plan stays on screen, and highlights the one for the card in play.',

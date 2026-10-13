@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#fff3ea" />
+    <script>
+      // Light/dark before first paint: light unless someone has switched to dark. See src/lib/theme.ts.
+      try {
+        var t = localStorage.getItem('burno:theme')
+        if (t !== 'dark') t = 'light'
+        document.documentElement.dataset.theme = t
+        if (t === 'dark') document.querySelector('meta[name="theme-color"]').setAttribute('content', '#170e0b')
+      } catch (e) {}
+    </script>
+    <meta name="description" content="A friend picked your workout. Flip the cards, do the reps, and beat their score on Burno." />
+    <link rel="icon" type="image/svg+xml" href="%BASE_URL%favicon.svg" />
+    <link rel="icon" type="image/png" sizes="512x512" href="%BASE_URL%icon-512.png" />
+    <link rel="apple-touch-icon" href="%BASE_URL%apple-touch-icon.png" />
+    <!-- Link previews for challenge links. Same app as index.html (keep the two heads in sync), with its own wording. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Burno" />
+    <meta property="og:url" content="https://burno.app/challenge" />
+    <meta property="og:title" content="You've been challenged on Burno 🔥" />
+    <meta property="og:description" content="A friend picked your workout. Flip the cards, do the reps, and beat their score." />
+    <meta property="og:image" content="https://burno.app/og-image.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Burno logo: a playing card with a flame, and the words Flip. Burn. Repeat." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://burno.app/og-image.png" />
+    <title>Burno · You've been challenged</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

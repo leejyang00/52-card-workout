@@ -1,6 +1,7 @@
 import type { PostHog } from 'posthog-js'
 import type { Session } from '../hooks/useSession'
 import { elapsedMs } from '../hooks/useSession'
+import { compareResults, type Challenge } from './challenge'
 import { moveTotals } from './deck'
 import type { Settings } from './types'
 
@@ -56,7 +57,15 @@ export function finishProperties(session: Session, now: number) {
     reps: moveTotals(deck, flipped, settings).reduce((sum, t) => sum + t.done, 0),
     duration_s: Math.round(elapsedMs(clock, now) / 1000),
     deck_size: settings.deckSize,
+    ...challengeProperties(session, now),
   }
+}
+
+/** For a challenge workout: which link it came from and how it went against the sender. */
+function challengeProperties({ challenge, flipped, clock }: Session, now: number) {
+  if (!challenge) return {}
+  const result = challenge.result && compareResults({ flipped, timeMs: elapsedMs(clock, now) }, challenge.result)
+  return { challenge_id: challenge.id, challenge_outcome: result?.kind ?? 'no_target' }
 }
 
 export function trackWorkoutStarted(settings: Settings, restart = false): void {
@@ -65,4 +74,25 @@ export function trackWorkoutStarted(settings: Settings, restart = false): void {
 
 export function trackWorkoutFinished(session: Session): void {
   track('workout_finished', finishProperties(session, Date.now()))
+}
+
+/** Counts only: never the names, moves or deck in the link. */
+export function challengeLinkProperties({ id, settings, result }: Challenge) {
+  return { challenge_id: id, deck_size: settings.deckSize, jokers: settings.jokers, has_target: result != null }
+}
+
+export function trackChallengeCreated(challenge: Challenge, source: 'setup' | 'summary', rematch: boolean): void {
+  track('challenge_created', { ...challengeLinkProperties(challenge), source, rematch })
+}
+
+export function trackChallengeShared(challenge: Challenge, method: 'share' | 'copy'): void {
+  track('challenge_shared', { challenge_id: challenge.id, method })
+}
+
+export function trackChallengeOpened(challenge: Challenge): void {
+  track('challenge_opened', challengeLinkProperties(challenge))
+}
+
+export function trackChallengeAccepted(challenge: Challenge): void {
+  track('challenge_accepted', challengeLinkProperties(challenge))
 }
