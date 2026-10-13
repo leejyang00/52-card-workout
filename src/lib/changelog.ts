@@ -12,6 +12,14 @@ export interface Release {
 export const RELEASES: Release[] = [
   {
     date: '2026-10-13',
+    title: 'Changed your mind? Go back',
+    changes: [
+      "Started a workout but haven't flipped a card yet? Tap Back to return home, or to the challenge you came from.",
+      "End now only shows once you've flipped a card, so a workout you never started doesn't count as finished.",
+    ],
+  },
+  {
+    date: '2026-10-13',
     title: 'Challenge a friend',
     changes: [
       'Send a friend a link to the workout you picked. They get your moves and the exact same shuffled deck.',

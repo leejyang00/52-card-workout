@@ -3,7 +3,7 @@ import { useLocalStorage } from './hooks/useLocalStorage'
 import { useSession } from './hooks/useSession'
 import { trackChallengeAccepted, trackChallengeOpened, trackWorkoutFinished, trackWorkoutStarted } from './lib/analytics'
 import { siteUrl } from './lib/brand'
-import { CHALLENGE_PARAM, challengeFromUrl } from './lib/challenge'
+import { CHALLENGE_PARAM, challengeFromUrl, challengeUrl } from './lib/challenge'
 import { DEFAULT_SETTINGS } from './lib/settings'
 import type { Settings } from './lib/types'
 import { ChallengeScreen } from './screens/ChallengeScreen'
@@ -76,6 +76,15 @@ export default function App() {
         onFinish={() => {
           trackWorkoutFinished(session)
           finish()
+        }}
+        onBack={() => {
+          // A challenge goes back to its landing screen, link and all, so it can still be accepted later.
+          if (session.challenge) {
+            const challenge = { ...session.challenge, settings: session.settings, deck: session.deck }
+            window.history.replaceState(null, '', challengeUrl(challenge))
+            setIncoming(challenge)
+          }
+          reset()
         }}
       />
     )

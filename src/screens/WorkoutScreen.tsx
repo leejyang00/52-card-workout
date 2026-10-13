@@ -18,9 +18,11 @@ interface Props {
   onPause: () => void
   onResume: () => void
   onFinish: () => void
+  /** Leave before the first flip, back where the workout was started from. */
+  onBack: () => void
 }
 
-export function WorkoutScreen({ session, onFlip, onUndo, onPause, onResume, onFinish }: Props) {
+export function WorkoutScreen({ session, onFlip, onUndo, onPause, onResume, onFinish, onBack }: Props) {
   const { deck, flipped, settings, clock } = session
   const running = clock.runningSince != null
   const now = useNow(running)
@@ -134,9 +136,25 @@ export function WorkoutScreen({ session, onFlip, onUndo, onPause, onResume, onFi
 
       <div className="fixed inset-x-0 bottom-0 z-10 border-t border-base-800 bg-base-950/95 px-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur">
         <div className="mx-auto flex max-w-xl gap-2">
-          <Button variant="ghost" size="lg" className="max-sm:px-3" onClick={onUndo} disabled={flipped === 0} aria-label="Undo last flip">
-            Undo
-          </Button>
+          {/* Nothing to undo or end before the first flip, so offer a way back instead. */}
+          {flipped === 0 ? (
+            <Button
+              variant="ghost"
+              size="lg"
+              className="max-sm:px-3"
+              onClick={onBack}
+              aria-label={session.challenge ? 'Back to the challenge' : 'Back to home'}
+            >
+              <svg viewBox="0 0 20 20" fill="currentColor" className="size-5 shrink-0" aria-hidden>
+                <path d="M12.79 5.23a.75.75 0 0 1-.02 1.06L8.83 10l3.94 3.71a.75.75 0 1 1-1.04 1.08l-4.5-4.25a.75.75 0 0 1 0-1.08l4.5-4.25a.75.75 0 0 1 1.06.02Z" />
+              </svg>
+              Back
+            </Button>
+          ) : (
+            <Button variant="ghost" size="lg" className="max-sm:px-3" onClick={onUndo} aria-label="Undo last flip">
+              Undo
+            </Button>
+          )}
           {done ? (
             <Button variant="primary" size="lg" className="flex-1 whitespace-nowrap max-sm:px-4" onClick={onFinish}>
               Finish workout
@@ -146,7 +164,7 @@ export function WorkoutScreen({ session, onFlip, onUndo, onPause, onResume, onFi
               {flipped === 0 ? 'Flip first card' : 'Next card'}
             </Button>
           )}
-          {!done && (
+          {!done && flipped > 0 && (
             <Button variant="ghost" size="lg" className="max-sm:px-3" onClick={confirmFinish}>
               End
             </Button>
