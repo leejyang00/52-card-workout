@@ -4,9 +4,8 @@ import { DrawnPile } from '../components/DrawnPile'
 import { JokerTimer } from '../components/JokerTimer'
 import { MoveTotals } from '../components/MoveTotals'
 import { CardBack, PlayingCard } from '../components/PlayingCard'
-import { SuitBadge } from '../components/SuitBadge'
 import { TimerBar } from '../components/TimerBar'
-import { isFaceCard, moveTotals, slotFor, SUIT_LABEL, taskFor } from '../lib/deck'
+import { isFaceCard, moveTotals, slotFor, taskFor } from '../lib/deck'
 import { exerciseNote } from '../lib/exercises'
 import { elapsedMs, type Session } from '../hooks/useSession'
 import { useNow } from '../hooks/useNow'
@@ -87,24 +86,12 @@ export function WorkoutScreen({ session, onFlip, onUndo, onPause, onResume, onFi
             {current ? <PlayingCard key={current.id} card={current} /> : <CardBack remaining={remaining} />}
           </button>
 
-          <div className="mt-6 min-h-28">
+          {/* Room for a two-line move so the layout holds still between flips; not needed before the first. */}
+          <div className={`mt-6 ${task ? 'min-h-28' : ''}`}>
             {!task && (
               <>
                 <p className="text-2xl font-bold">Ready when you are</p>
                 <p className="mt-1 text-base-400">Tap the deck or hit flip to draw your first card.</p>
-                {/* Wide screens show the plan in the reps panel beside the deck. */}
-                <ul aria-label="Your plan" className="mx-auto mt-5 grid w-fit gap-2 text-left lg:hidden">
-                  {totals.map(({ move, slots }) => (
-                    <li key={move} className="flex items-center gap-3">
-                      <span className="flex gap-0.5">
-                        {slots.map((slot) => (
-                          <SuitBadge key={slot} suit={slot} size="sm" label={slot === 'ace' ? 'Any ace' : SUIT_LABEL[slot]} />
-                        ))}
-                      </span>
-                      <span className="font-semibold">{move}</span>
-                    </li>
-                  ))}
-                </ul>
               </>
             )}
             {task?.kind === 'move' && (
@@ -147,20 +134,20 @@ export function WorkoutScreen({ session, onFlip, onUndo, onPause, onResume, onFi
 
       <div className="fixed inset-x-0 bottom-0 z-10 border-t border-base-800 bg-base-950/95 px-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur">
         <div className="mx-auto flex max-w-xl gap-2">
-          <Button variant="ghost" size="lg" onClick={onUndo} disabled={flipped === 0} aria-label="Undo last flip">
+          <Button variant="ghost" size="lg" className="max-sm:px-3" onClick={onUndo} disabled={flipped === 0} aria-label="Undo last flip">
             Undo
           </Button>
           {done ? (
-            <Button variant="primary" size="lg" className="flex-1" onClick={onFinish}>
+            <Button variant="primary" size="lg" className="flex-1 whitespace-nowrap max-sm:px-4" onClick={onFinish}>
               Finish workout
             </Button>
           ) : (
-            <Button variant="primary" size="lg" className="flex-1" onClick={flip}>
+            <Button variant="primary" size="lg" className="flex-1 whitespace-nowrap max-sm:px-4" onClick={flip}>
               {flipped === 0 ? 'Flip first card' : 'Next card'}
             </Button>
           )}
           {!done && (
-            <Button variant="ghost" size="lg" onClick={confirmFinish}>
+            <Button variant="ghost" size="lg" className="max-sm:px-3" onClick={confirmFinish}>
               End
             </Button>
           )}

@@ -1,6 +1,9 @@
 @import 'tailwindcss';
 @import '@fontsource-variable/archivo/wdth.css';
 
+/* Phones with little height (iPhone SE, or Safari with its toolbars showing). */
+@custom-variant short (@media (max-height: 700px));
+
 @theme {
   --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
   /* Wordmark and big headlines only. Set [font-stretch:125%] for the wide cut. */
