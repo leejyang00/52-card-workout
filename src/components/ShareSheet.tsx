@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { BRAND, displayUrl, siteUrl } from '../lib/brand'
 import { formatDuration } from '../lib/format'
-import { renderShareCard, type ShareStats } from '../lib/shareCard'
+import { renderShareCard, type ShareStats, type ShareStyle } from '../lib/shareCard'
 import { Button } from './Button'
+import { Segmented } from './Segmented'
 import { Sheet } from './Sheet'
 
 interface Props {
@@ -11,7 +12,16 @@ interface Props {
   stats: Omit<ShareStats, 'url'>
 }
 
-const FILE_NAME = 'my-workout.png'
+const FILE_NAMES: Record<ShareStyle, string> = { card: 'my-workout.png', overlay: 'my-workout-overlay.png' }
+
+const STYLES: { value: ShareStyle; label: string }[] = [
+  { value: 'card', label: 'Card' },
+  { value: 'overlay', label: 'Transparent' },
+]
+
+type Images = Record<ShareStyle, { blob: Blob; url: string }>
+
+const canCopyImage = typeof ClipboardItem !== 'undefined' && !!navigator.clipboard?.write
 
 // Browsers can't write to the photo library directly. On iOS a download lands in
 // Files, but the share sheet offers "Save Image" which goes straight to Photos.
@@ -21,29 +31,37 @@ const isIOS =
   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
 
 export function ShareSheet({ open, onClose, stats }: Props) {
-  const [image, setImage] = useState<{ blob: Blob; url: string } | null>(null)
+  const [images, setImages] = useState<Images | null>(null)
+  const [style, setStyle] = useState<ShareStyle>('card')
   const [notice, setNotice] = useState('')
 
   useEffect(() => {
     if (!open) return
-    let url = ''
+    let urls: string[] = []
     let cancelled = false
-    renderShareCard({ ...stats, url: displayUrl() }).then((blob) => {
+    const full = { ...stats, url: displayUrl() }
+    // Render both styles up front so switching between them is instant.
+    Promise.all([renderShareCard(full, 'card'), renderShareCard(full, 'overlay')]).then(([card, overlay]) => {
       if (cancelled) return
-      url = URL.createObjectURL(blob)
-      setImage({ blob, url })
+      const next: Images = {
+        card: { blob: card, url: URL.createObjectURL(card) },
+        overlay: { blob: overlay, url: URL.createObjectURL(overlay) },
+      }
+      urls = [next.card.url, next.overlay.url]
+      setImages(next)
     })
     return () => {
       cancelled = true
-      if (url) URL.revokeObjectURL(url)
-      setImage(null)
+      urls.forEach((u) => URL.revokeObjectURL(u))
+      setImages(null)
       setNotice('')
     }
     // Stats are fixed once the workout has finished, so only re-render on open.
   }, [open])
 
   const caption = `${stats.cleared ? 'Cleared the deck' : `${stats.flipped} cards down`}: ${stats.reps} reps in ${formatDuration(stats.timeMs)} on ${BRAND.name}. Your turn 👉 ${siteUrl()}`
-  const file = image && new File([image.blob], FILE_NAME, { type: 'image/png' })
+  const image = images?.[style]
+  const file = image && new File([image.blob], FILE_NAMES[style], { type: 'image/png' })
   const canShareFile = !!file && !!navigator.canShare?.({ files: [file] })
 
   const saveLabel = isIOS && canShareFile ? 'Save to Photos' : 'Save image'
@@ -72,13 +90,28 @@ export function ShareSheet({ open, onClose, stats }: Props) {
     }
     const a = document.createElement('a')
     a.href = image.url
-    a.download = FILE_NAME
+    a.download = FILE_NAMES[style]
     a.click()
     setNotice(
       isIOS
         ? 'Saved to Files. To add it to Photos, press and hold the image above and tap "Save to Photos".'
         : 'Image saved. Find it in your gallery or downloads, then post it or send it to a friend.',
     )
+  }
+
+  const copyImage = async () => {
+    if (!image) return
+    try {
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': image.blob })])
+      setNotice('Image copied. Paste it into your story to drop it on as a sticker.')
+    } catch {
+      setNotice("Couldn't copy the image. Try saving it instead.")
+    }
+  }
+
+  const changeStyle = (next: ShareStyle) => {
+    setStyle(next)
+    setNotice('')
   }
 
   const copy = async () => {
@@ -112,9 +145,15 @@ export function ShareSheet({ open, onClose, stats }: Props) {
                 {saveLabel}
               </Button>
             )}
-            <Button className="flex-1" onClick={copy}>
-              Copy caption
-            </Button>
+            {style === 'overlay' && canCopyImage ? (
+              <Button className="flex-1" onClick={copyImage} disabled={!image}>
+                Copy image
+              </Button>
+            ) : (
+              <Button className="flex-1" onClick={copy}>
+                Copy caption
+              </Button>
+            )}
           </div>
           <p role="status" className="min-h-5 text-center text-sm text-base-400">
             {notice}
@@ -122,13 +161,29 @@ export function ShareSheet({ open, onClose, stats }: Props) {
         </div>
       }
     >
-      <div className="mx-auto aspect-[9/16] w-full max-w-60 overflow-hidden rounded-2xl bg-base-950 ring-1 ring-base-800">
+      <div className="mb-4">
+        <Segmented label="Image style" options={STYLES} value={style} onChange={changeStyle} />
+      </div>
+      <div
+        className={`mx-auto aspect-[9/16] w-full max-w-60 overflow-hidden rounded-2xl ring-1 ring-base-800 ${
+          style === 'overlay' ? 'checkerboard grid place-items-center p-3' : 'bg-base-950'
+        }`}
+      >
         {image ? (
-          <img src={image.url} alt="Workout summary image" className="size-full" />
+          <img
+            src={image.url}
+            alt={style === 'overlay' ? 'Workout stats on a transparent background' : 'Workout summary image'}
+            className={style === 'overlay' ? 'max-h-full w-full object-contain' : 'size-full'}
+          />
         ) : (
           <div className="grid size-full place-items-center text-sm text-base-500">Dealing your card…</div>
         )}
       </div>
+      {style === 'overlay' && (
+        <p className="mt-3 text-center text-sm text-base-400">
+          No background, just your stats. Add it over your own photo in your story.
+        </p>
+      )}
     </Sheet>
   )
 }

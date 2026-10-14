@@ -11,6 +11,14 @@ export interface Release {
  */
 export const RELEASES: Release[] = [
   {
+    date: '2026-10-14',
+    title: 'Share your stats on your own photo',
+    changes: [
+      'Pick "Transparent" when sharing to get just your stats, with no background.',
+      'Lay it over a gym selfie or sunset shot in your story. Copy image pastes it in as a sticker.',
+    ],
+  },
+  {
     date: '2026-10-13',
     title: 'Challenge a friend',
     changes: [

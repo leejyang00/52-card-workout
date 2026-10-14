@@ -124,3 +124,10 @@
   --color-select: #fff3ea;
   --color-on-select: #24140f;
 }
+
+/* Signals "transparent" behind the share overlay preview. Dark in both themes so white stats read. */
+@utility checkerboard {
+  background-color: #2b2b2b;
+  background-image: repeating-conic-gradient(#3a3a3a 0 25%, transparent 0 50%);
+  background-size: 20px 20px;
+}
