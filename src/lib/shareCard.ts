@@ -205,8 +205,10 @@ export function drawShareCard(ctx: Ctx, s: ShareStats) {
 const OVERLAY_INK = '#ffffff'
 const OVERLAY_SHADOW = 'rgb(0 0 0 / 0.35)'
 const OVERLAY_TOP = 80
-const OVERLAY_HEADLINE = 96
+// No headline: CARDS already says whether the deck was cleared. Stats sit 250px apart, and the
+// block ends just under the last value.
 const OVERLAY_STAT_H = 250
+const OVERLAY_STATS_H = OVERLAY_STAT_H * 2 + 170
 const OVERLAY_LIST_GAP = 70
 // A cleared deck fills every bar, so its rows drop the bar and sit closer together.
 const OVERLAY_ROW_H = 84
@@ -227,8 +229,7 @@ export function overlayHeight(s: ShareStats): number {
   const rows = overlayRows(s).length
   return (
     OVERLAY_TOP +
-    OVERLAY_HEADLINE +
-    OVERLAY_STAT_H * 3 +
+    OVERLAY_STATS_H +
     (rows ? OVERLAY_LIST_GAP + rows * overlayRowH(s) : 0) +
     OVERLAY_BRAND_GAP +
     MARK_HEIGHT * OVERLAY_MARK_SCALE +
@@ -255,35 +256,24 @@ export function drawShareOverlay(ctx: Ctx, s: ShareStats) {
   ctx.shadowBlur = 16
   ctx.shadowOffsetY = 2
 
-  // Headline: "DECK CLEARED" / "34 CARDS DOWN", the last word in flame colours.
-  let y = OVERLAY_TOP + OVERLAY_HEADLINE
-  font(ctx, 900, OVERLAY_HEADLINE, 2)
-  const lead = s.cleared ? 'DECK ' : `${s.flipped} CARDS `
-  const hot = s.cleared ? 'CLEARED' : 'DOWN'
-  const leadW = ctx.measureText(lead).width
-  const hx = (W - leadW - ctx.measureText(hot).width) / 2
-  ctx.fillStyle = OVERLAY_INK
-  ctx.fillText(lead, hx, y)
-  ctx.fillStyle = flameFill(ctx, y, OVERLAY_HEADLINE, C.flame, C.flame2)
-  ctx.fillText(hot, hx + leadW, y)
-
   ctx.textAlign = 'center'
   const stats: [string, string][] = [
     ['TIME', formatDuration(s.timeMs)],
     ['CARDS', `${s.flipped}/${s.deckLength}`],
     ['REPS', String(s.reps)],
   ]
-  for (const [label, value] of stats) {
+  stats.forEach(([label, value], i) => {
+    const top = OVERLAY_TOP + i * OVERLAY_STAT_H
     // Labels stay white: thin amber text disappears on warm photos, the very ones people post.
     ctx.fillStyle = OVERLAY_INK
     font(ctx, 700, 30, 6)
     ctx.globalAlpha = 0.85
-    ctx.fillText(label, W / 2, y + 110)
+    ctx.fillText(label, W / 2, top + 30)
     ctx.globalAlpha = 1
     font(ctx, 900, 128, -3)
-    ctx.fillText(value, W / 2, y + 240)
-    y += OVERLAY_STAT_H
-  }
+    ctx.fillText(value, W / 2, top + 160)
+  })
+  let y = OVERLAY_TOP + OVERLAY_STATS_H
 
   const rows = overlayRows(s)
   const rowH = overlayRowH(s)
