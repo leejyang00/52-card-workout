@@ -77,7 +77,7 @@ function fitText(ctx: Ctx, text: string, maxWidth: number): string {
   return `${t}…`
 }
 
-function panel(ctx: Ctx, x: number, y: number, w: number, h: number, r: number, color: string | CanvasGradient) {
+function panel(ctx: Ctx, x: number, y: number, w: number, h: number, r: number, color: string) {
   ctx.fillStyle = color
   ctx.beginPath()
   ctx.roundRect(x, y, w, h, r)
@@ -210,9 +210,8 @@ const OVERLAY_TOP = 80
 const OVERLAY_STAT_H = 250
 const OVERLAY_STATS_H = OVERLAY_STAT_H * 2 + 170
 const OVERLAY_LIST_GAP = 70
-// A cleared deck fills every bar, so its rows drop the bar and sit closer together.
-const OVERLAY_ROW_H = 84
-const OVERLAY_ROW_H_CLEARED = 64
+// Moves and reps only, no progress bars: the overlay stays quiet over a photo.
+const OVERLAY_ROW_H = 64
 const OVERLAY_BRAND_GAP = 90
 const OVERLAY_MARK_SCALE = 0.8
 const OVERLAY_BOTTOM = 70
@@ -221,16 +220,12 @@ function overlayRows(s: ShareStats) {
   return s.totals.filter((t) => t.done > 0).slice(0, 5)
 }
 
-function overlayRowH(s: ShareStats) {
-  return s.cleared ? OVERLAY_ROW_H_CLEARED : OVERLAY_ROW_H
-}
-
 export function overlayHeight(s: ShareStats): number {
   const rows = overlayRows(s).length
   return (
     OVERLAY_TOP +
     OVERLAY_STATS_H +
-    (rows ? OVERLAY_LIST_GAP + rows * overlayRowH(s) : 0) +
+    (rows ? OVERLAY_LIST_GAP + rows * OVERLAY_ROW_H : 0) +
     OVERLAY_BRAND_GAP +
     MARK_HEIGHT * OVERLAY_MARK_SCALE +
     OVERLAY_BOTTOM
@@ -250,13 +245,13 @@ export function drawShareOverlay(ctx: Ctx, s: ShareStats) {
   const C = colors()
   ctx.clearRect(0, 0, W, ctx.canvas.height)
   ctx.textBaseline = 'alphabetic'
-  ctx.textAlign = 'left'
+  ctx.textAlign = 'center'
+  ctx.fillStyle = OVERLAY_INK
   // A soft shadow keeps the stats legible on bright photos without looking like a box.
   ctx.shadowColor = OVERLAY_SHADOW
   ctx.shadowBlur = 16
   ctx.shadowOffsetY = 2
 
-  ctx.textAlign = 'center'
   const stats: [string, string][] = [
     ['TIME', formatDuration(s.timeMs)],
     ['CARDS', `${s.flipped}/${s.deckLength}`],
@@ -265,7 +260,6 @@ export function drawShareOverlay(ctx: Ctx, s: ShareStats) {
   stats.forEach(([label, value], i) => {
     const top = OVERLAY_TOP + i * OVERLAY_STAT_H
     // Labels stay white: thin amber text disappears on warm photos, the very ones people post.
-    ctx.fillStyle = OVERLAY_INK
     font(ctx, 700, 30, 6)
     ctx.globalAlpha = 0.85
     ctx.fillText(label, W / 2, top + 30)
@@ -276,20 +270,12 @@ export function drawShareOverlay(ctx: Ctx, s: ShareStats) {
   let y = OVERLAY_TOP + OVERLAY_STATS_H
 
   const rows = overlayRows(s)
-  const rowH = overlayRowH(s)
   if (rows.length) {
     y += OVERLAY_LIST_GAP
     const left = 200
     const right = W - 200
-    const barW = right - left
-    // Sunrise along the whole track, so a fuller bar burns further into the pink.
-    const sunrise = ctx.createLinearGradient(left, 0, right, 0)
-    sunrise.addColorStop(0, C.flame)
-    sunrise.addColorStop(0.5, C.accent)
-    sunrise.addColorStop(1, C.flame2)
     rows.forEach((t, i) => {
-      const rowY = y + 40 + i * rowH
-      ctx.fillStyle = OVERLAY_INK
+      const rowY = y + 40 + i * OVERLAY_ROW_H
       font(ctx, 900, 44, -1)
       ctx.textAlign = 'right'
       ctx.fillText(String(t.done), right, rowY)
@@ -297,14 +283,8 @@ export function drawShareOverlay(ctx: Ctx, s: ShareStats) {
       ctx.textAlign = 'left'
       font(ctx, 600, 40)
       ctx.fillText(fitText(ctx, t.move, right - left - repsW - 32), left, rowY)
-      if (s.cleared) return
-      ctx.globalAlpha = 0.3
-      panel(ctx, left, rowY + 18, barW, 10, 5, OVERLAY_INK)
-      ctx.globalAlpha = 1
-      const pct = t.total ? t.done / t.total : 0
-      if (pct > 0) panel(ctx, left, rowY + 18, Math.max(10, barW * pct), 10, 5, sunrise)
     })
-    y += rows.length * rowH
+    y += rows.length * OVERLAY_ROW_H
   }
 
   // Brand: mark + wordmark centred as one group, the last letter in flame colours as in the app.
