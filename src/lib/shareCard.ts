@@ -77,7 +77,7 @@ function fitText(ctx: Ctx, text: string, maxWidth: number): string {
   return `${t}…`
 }
 
-function panel(ctx: Ctx, x: number, y: number, w: number, h: number, r: number, color: string) {
+function panel(ctx: Ctx, x: number, y: number, w: number, h: number, r: number, color: string | CanvasGradient) {
   ctx.fillStyle = color
   ctx.beginPath()
   ctx.roundRect(x, y, w, h, r)
@@ -200,14 +200,17 @@ export function drawShareCard(ctx: Ctx, s: ShareStats) {
   ctx.textAlign = 'left'
 }
 
-// Overlay: white stats on a transparent background, cropped to fit, to lay over your own photo.
+// Overlay: stats on a transparent background, cropped to fit, to lay over your own photo. Numbers
+// stay white so they read on any photo; the sunrise flame colours carry the brand.
 const OVERLAY_INK = '#ffffff'
 const OVERLAY_SHADOW = 'rgb(0 0 0 / 0.35)'
 const OVERLAY_TOP = 80
 const OVERLAY_HEADLINE = 96
 const OVERLAY_STAT_H = 250
 const OVERLAY_LIST_GAP = 70
+// A cleared deck fills every bar, so its rows drop the bar and sit closer together.
 const OVERLAY_ROW_H = 84
+const OVERLAY_ROW_H_CLEARED = 64
 const OVERLAY_BRAND_GAP = 90
 const OVERLAY_MARK_SCALE = 0.8
 const OVERLAY_BOTTOM = 70
@@ -216,17 +219,29 @@ function overlayRows(s: ShareStats) {
   return s.totals.filter((t) => t.done > 0).slice(0, 5)
 }
 
+function overlayRowH(s: ShareStats) {
+  return s.cleared ? OVERLAY_ROW_H_CLEARED : OVERLAY_ROW_H
+}
+
 export function overlayHeight(s: ShareStats): number {
   const rows = overlayRows(s).length
   return (
     OVERLAY_TOP +
     OVERLAY_HEADLINE +
     OVERLAY_STAT_H * 3 +
-    (rows ? OVERLAY_LIST_GAP + rows * OVERLAY_ROW_H : 0) +
+    (rows ? OVERLAY_LIST_GAP + rows * overlayRowH(s) : 0) +
     OVERLAY_BRAND_GAP +
     MARK_HEIGHT * OVERLAY_MARK_SCALE +
     OVERLAY_BOTTOM
   )
+}
+
+/** The logo's flame gradient, hot pink at the baseline to amber at the cap, for text `size` px tall. */
+function flameFill(ctx: Ctx, baseline: number, size: number, tip: string, base: string) {
+  const grad = ctx.createLinearGradient(0, baseline, 0, baseline - size * 0.75)
+  grad.addColorStop(0, base)
+  grad.addColorStop(1, tip)
+  return grad
 }
 
 export function drawShareOverlay(ctx: Ctx, s: ShareStats) {
@@ -234,23 +249,33 @@ export function drawShareOverlay(ctx: Ctx, s: ShareStats) {
   const C = colors()
   ctx.clearRect(0, 0, W, ctx.canvas.height)
   ctx.textBaseline = 'alphabetic'
-  ctx.textAlign = 'center'
-  ctx.fillStyle = OVERLAY_INK
-  // A soft shadow keeps white legible on bright photos without looking like a box.
+  ctx.textAlign = 'left'
+  // A soft shadow keeps the stats legible on bright photos without looking like a box.
   ctx.shadowColor = OVERLAY_SHADOW
   ctx.shadowBlur = 16
   ctx.shadowOffsetY = 2
 
+  // Headline: "DECK CLEARED" / "34 CARDS DOWN", the last word in flame colours.
   let y = OVERLAY_TOP + OVERLAY_HEADLINE
   font(ctx, 900, OVERLAY_HEADLINE, 2)
-  ctx.fillText(s.cleared ? 'DECK CLEARED' : `${s.flipped} CARDS DOWN`, W / 2, y)
+  const lead = s.cleared ? 'DECK ' : `${s.flipped} CARDS `
+  const hot = s.cleared ? 'CLEARED' : 'DOWN'
+  const leadW = ctx.measureText(lead).width
+  const hx = (W - leadW - ctx.measureText(hot).width) / 2
+  ctx.fillStyle = OVERLAY_INK
+  ctx.fillText(lead, hx, y)
+  ctx.fillStyle = flameFill(ctx, y, OVERLAY_HEADLINE, C.flame, C.flame2)
+  ctx.fillText(hot, hx + leadW, y)
 
+  ctx.textAlign = 'center'
   const stats: [string, string][] = [
     ['TIME', formatDuration(s.timeMs)],
     ['CARDS', `${s.flipped}/${s.deckLength}`],
     ['REPS', String(s.reps)],
   ]
   for (const [label, value] of stats) {
+    // Labels stay white: thin amber text disappears on warm photos, the very ones people post.
+    ctx.fillStyle = OVERLAY_INK
     font(ctx, 700, 30, 6)
     ctx.globalAlpha = 0.85
     ctx.fillText(label, W / 2, y + 110)
@@ -261,12 +286,20 @@ export function drawShareOverlay(ctx: Ctx, s: ShareStats) {
   }
 
   const rows = overlayRows(s)
+  const rowH = overlayRowH(s)
   if (rows.length) {
     y += OVERLAY_LIST_GAP
     const left = 200
     const right = W - 200
+    const barW = right - left
+    // Sunrise along the whole track, so a fuller bar burns further into the pink.
+    const sunrise = ctx.createLinearGradient(left, 0, right, 0)
+    sunrise.addColorStop(0, C.flame)
+    sunrise.addColorStop(0.5, C.accent)
+    sunrise.addColorStop(1, C.flame2)
     rows.forEach((t, i) => {
-      const rowY = y + 40 + i * OVERLAY_ROW_H
+      const rowY = y + 40 + i * rowH
+      ctx.fillStyle = OVERLAY_INK
       font(ctx, 900, 44, -1)
       ctx.textAlign = 'right'
       ctx.fillText(String(t.done), right, rowY)
@@ -274,17 +307,17 @@ export function drawShareOverlay(ctx: Ctx, s: ShareStats) {
       ctx.textAlign = 'left'
       font(ctx, 600, 40)
       ctx.fillText(fitText(ctx, t.move, right - left - repsW - 32), left, rowY)
-      const barW = right - left
+      if (s.cleared) return
       ctx.globalAlpha = 0.3
-      panel(ctx, left, rowY + 18, barW, 8, 4, OVERLAY_INK)
+      panel(ctx, left, rowY + 18, barW, 10, 5, OVERLAY_INK)
       ctx.globalAlpha = 1
       const pct = t.total ? t.done / t.total : 0
-      panel(ctx, left, rowY + 18, Math.max(8, barW * pct), 8, 4, OVERLAY_INK)
+      if (pct > 0) panel(ctx, left, rowY + 18, Math.max(10, barW * pct), 10, 5, sunrise)
     })
-    y += rows.length * OVERLAY_ROW_H
+    y += rows.length * rowH
   }
 
-  // Brand: mark + wordmark, centred as one group.
+  // Brand: mark + wordmark centred as one group, the last letter in flame colours as in the app.
   y += OVERLAY_BRAND_GAP
   ctx.font = `900 64px ${DISPLAY_FONT}`
   if ('fontStretch' in ctx) ctx.fontStretch = 'expanded'
@@ -293,8 +326,12 @@ export function drawShareOverlay(ctx: Ctx, s: ShareStats) {
   const markW = MARK_WIDTH * OVERLAY_MARK_SCALE
   const groupW = markW + 20 + ctx.measureText(word).width
   const gx = (W - groupW) / 2
+  const wx = gx + markW + 20
   ctx.textAlign = 'left'
-  ctx.fillText(word, gx + markW + 20, y + 64)
+  ctx.fillStyle = OVERLAY_INK
+  ctx.fillText(word.slice(0, -1), wx, y + 64)
+  ctx.fillStyle = flameFill(ctx, y + 64, 64, C.flame, C.flame2)
+  ctx.fillText(word.slice(-1), wx + ctx.measureText(word.slice(0, -1)).width, y + 64)
   if ('fontStretch' in ctx) ctx.fontStretch = 'normal'
   ctx.shadowColor = 'transparent'
   drawMark(ctx, gx, y - 2, OVERLAY_MARK_SCALE, C.flame, C.flame2, C.flameCore)
