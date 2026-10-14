@@ -200,13 +200,124 @@ export function drawShareCard(ctx: Ctx, s: ShareStats) {
   ctx.textAlign = 'left'
 }
 
-export async function renderShareCard(stats: ShareStats): Promise<Blob> {
+// Overlay: stats on a transparent background, cropped to fit, to lay over your own photo. Numbers
+// stay white so they read on any photo; the sunrise flame colours carry the brand.
+const OVERLAY_INK = '#ffffff'
+const OVERLAY_SHADOW = 'rgb(0 0 0 / 0.35)'
+const OVERLAY_TOP = 80
+// No headline: CARDS already says whether the deck was cleared. Stats sit 250px apart, and the
+// block ends just under the last value.
+const OVERLAY_STAT_H = 250
+const OVERLAY_STATS_H = OVERLAY_STAT_H * 2 + 170
+const OVERLAY_LIST_GAP = 70
+// Moves and reps only, no progress bars: the overlay stays quiet over a photo.
+const OVERLAY_ROW_H = 64
+const OVERLAY_BRAND_GAP = 90
+const OVERLAY_MARK_SCALE = 0.8
+const OVERLAY_BOTTOM = 70
+
+function overlayRows(s: ShareStats) {
+  return s.totals.filter((t) => t.done > 0).slice(0, 5)
+}
+
+export function overlayHeight(s: ShareStats): number {
+  const rows = overlayRows(s).length
+  return (
+    OVERLAY_TOP +
+    OVERLAY_STATS_H +
+    (rows ? OVERLAY_LIST_GAP + rows * OVERLAY_ROW_H : 0) +
+    OVERLAY_BRAND_GAP +
+    MARK_HEIGHT * OVERLAY_MARK_SCALE +
+    OVERLAY_BOTTOM
+  )
+}
+
+/** The logo's flame gradient, hot pink at the baseline to amber at the cap, for text `size` px tall. */
+function flameFill(ctx: Ctx, baseline: number, size: number, tip: string, base: string) {
+  const grad = ctx.createLinearGradient(0, baseline, 0, baseline - size * 0.75)
+  grad.addColorStop(0, base)
+  grad.addColorStop(1, tip)
+  return grad
+}
+
+export function drawShareOverlay(ctx: Ctx, s: ShareStats) {
+  const W = SHARE_WIDTH
+  const C = colors()
+  ctx.clearRect(0, 0, W, ctx.canvas.height)
+  ctx.textBaseline = 'alphabetic'
+  ctx.textAlign = 'center'
+  ctx.fillStyle = OVERLAY_INK
+  // A soft shadow keeps the stats legible on bright photos without looking like a box.
+  ctx.shadowColor = OVERLAY_SHADOW
+  ctx.shadowBlur = 16
+  ctx.shadowOffsetY = 2
+
+  const stats: [string, string][] = [
+    ['TIME', formatDuration(s.timeMs)],
+    ['CARDS', `${s.flipped}/${s.deckLength}`],
+    ['REPS', String(s.reps)],
+  ]
+  stats.forEach(([label, value], i) => {
+    const top = OVERLAY_TOP + i * OVERLAY_STAT_H
+    // Labels stay white: thin amber text disappears on warm photos, the very ones people post.
+    font(ctx, 700, 30, 6)
+    ctx.globalAlpha = 0.85
+    ctx.fillText(label, W / 2, top + 30)
+    ctx.globalAlpha = 1
+    font(ctx, 900, 128, -3)
+    ctx.fillText(value, W / 2, top + 160)
+  })
+  let y = OVERLAY_TOP + OVERLAY_STATS_H
+
+  const rows = overlayRows(s)
+  if (rows.length) {
+    y += OVERLAY_LIST_GAP
+    const left = 200
+    const right = W - 200
+    rows.forEach((t, i) => {
+      const rowY = y + 40 + i * OVERLAY_ROW_H
+      font(ctx, 900, 44, -1)
+      ctx.textAlign = 'right'
+      ctx.fillText(String(t.done), right, rowY)
+      const repsW = ctx.measureText(String(t.done)).width
+      ctx.textAlign = 'left'
+      font(ctx, 600, 40)
+      ctx.fillText(fitText(ctx, t.move, right - left - repsW - 32), left, rowY)
+    })
+    y += rows.length * OVERLAY_ROW_H
+  }
+
+  // Brand: mark + wordmark centred as one group, the last letter in flame colours as in the app.
+  y += OVERLAY_BRAND_GAP
+  ctx.font = `900 64px ${DISPLAY_FONT}`
+  if ('fontStretch' in ctx) ctx.fontStretch = 'expanded'
+  if ('letterSpacing' in ctx) ctx.letterSpacing = '-1px'
+  const word = BRAND.name.toUpperCase()
+  const markW = MARK_WIDTH * OVERLAY_MARK_SCALE
+  const groupW = markW + 20 + ctx.measureText(word).width
+  const gx = (W - groupW) / 2
+  const wx = gx + markW + 20
+  ctx.textAlign = 'left'
+  ctx.fillStyle = OVERLAY_INK
+  ctx.fillText(word.slice(0, -1), wx, y + 64)
+  ctx.fillStyle = flameFill(ctx, y + 64, 64, C.flame, C.flame2)
+  ctx.fillText(word.slice(-1), wx + ctx.measureText(word.slice(0, -1)).width, y + 64)
+  if ('fontStretch' in ctx) ctx.fontStretch = 'normal'
+  ctx.shadowColor = 'transparent'
+  drawMark(ctx, gx, y - 2, OVERLAY_MARK_SCALE, C.flame, C.flame2, C.flameCore)
+}
+
+export type ShareStyle = 'card' | 'overlay'
+
+export async function renderShareCard(stats: ShareStats, style: ShareStyle = 'card'): Promise<Blob> {
   const canvas = document.createElement('canvas')
   canvas.width = SHARE_WIDTH
-  canvas.height = SHARE_HEIGHT
+  canvas.height = style === 'overlay' ? overlayHeight(stats) : SHARE_HEIGHT
   // Canvas won't wait for a webfont, so make sure the wordmark face is ready first.
   await document.fonts.load(`900 112px ${DISPLAY_FONT}`).catch(() => {})
-  drawShareCard(canvas.getContext('2d')!, stats)
+  const ctx = canvas.getContext('2d')!
+  if (style === 'overlay') drawShareOverlay(ctx, stats)
+  else drawShareCard(ctx, stats)
   return new Promise((resolve, reject) =>
     canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('Could not render image'))), 'image/png'),
   )
